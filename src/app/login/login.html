@@ -10,7 +10,7 @@
             <input matInput type="password" formControlName="password" name="password" required>
         </mat-form-field>
         <button mat-flat-button type="submit" [disabled]="loginForm.invalid">Login</button>
-        <button mat-flat-button type="button" (click)="loginWithGoogle()">Login with Google</button>
+        <button mat-flat-button type="button" (click)="loginWithGoogle()">Continue with Google</button>
         @if (errorMessage) {
         <p class="error"> {{ errorMessage }} </p>
         }
