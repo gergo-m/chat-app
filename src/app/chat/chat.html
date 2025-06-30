@@ -1,0 +1,16 @@
+<div id="main-container">
+  <h2>Test messages from Firestore:</h2>
+  <ul>
+    @for (msg of testMessages$ | async; track msg.id) {
+    <li>
+      {{ msg.message }}
+    </li>
+    }
+  </ul>
+  <form (submit)="addMessage(messageInput.value); messageInput.value=''">
+    <mat-form-field>
+      <input matInput #messageInput type="text" placeholder="Send a message...">
+    </mat-form-field>
+    <button matButton type="submit"><mat-icon>send</mat-icon></button>
+  </form>
+</div>
