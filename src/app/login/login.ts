@@ -7,6 +7,8 @@ import { MatFormField, MatInputModule, MatLabel } from '@angular/material/input'
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { Auth, GoogleAuthProvider } from '@angular/fire/auth';
+import { signInWithPopup } from '@firebase/auth';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './login.scss'
 })
 export class Login {
+  auth = inject(Auth);
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -43,8 +46,18 @@ export class Login {
       await this.authService.login(email, password);
       this.router.navigateByUrl('/');
     } catch (error: any) {
-      this.errorMessage = error.message;
+      switch (error.code) {
+        case "auth/invalid-credential":
+          this.errorMessage = "Invalid email or password";
+          break;
+        default:
+          this.errorMessage = "Authentication failed. Please try again.";
+      }
     }
   }
 
+  async loginWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(this.auth, provider);
+  }
 }
