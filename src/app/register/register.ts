@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { Auth, GoogleAuthProvider } from '@angular/fire/auth';
-import { signInWithPopup } from '@firebase/auth';
+import { signInWithPopup, updateProfile } from '@firebase/auth';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { addDoc, collection, collectionData, doc, Firestore, setDoc } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -26,15 +28,21 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './register.scss'
 })
 export class Register {
+  firestore = inject(Firestore);
   auth = inject(Auth);
+  userCollection = collection(this.firestore, 'users');
+  users$: Observable<any[]>;
   
   registerForm = new FormGroup({
+    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
   });
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {
+    this.users$ = collectionData(this.userCollection, { idField: 'id' });
+  }
 
   async register() {
     try {
@@ -42,9 +50,14 @@ export class Register {
         this.errorMessage = "Please correct the form errors.";
         return;
       }
+      const name = this.registerForm.get('name')?.value ||'';
       const email = this.registerForm.get('email')?.value ||'';
       const password = this.registerForm.get('password')?.value ||'';
-      await this.authService.register(email, password);
+      const userCredential = await this.authService.register(email, password);
+      const uid = userCredential.user.uid;
+      await setDoc(doc(this.firestore, 'users', uid), {
+        name, email, createdAt: new Date()
+      });
       this.router.navigateByUrl('/');
     } catch (error: any) {
       this.errorMessage = error.message;

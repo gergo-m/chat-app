@@ -1,5 +1,5 @@
 <div id="main-container">
-  <h2>Test messages from Firestore:</h2>
+  <h2>Hello, {{ (userProfile$ | async)?.name }}! Test messages from Firestore:</h2>
   <ul>
     @for (msg of testMessages$ | async; track msg.id) {
     <li>
