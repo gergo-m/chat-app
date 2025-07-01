@@ -1,1 +1,18 @@
-<p>profile works!</p>
+<div class="profile-container">
+    <h2>Hello, {{ (userProfile$ | async)?.name }}!</h2>
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+        <mat-form-field appearance="outline">
+            <mat-label>New name</mat-label>
+            <input matInput type="text" formControlName="name" value="{{ (userProfile$ | async)?.name }}">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>New email</mat-label>
+            <input matInput type="email" formControlName="email" value="{{ (userProfile$ | async)?.email }}">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>New password</mat-label>
+            <input matInput type="password" formControlName="password">
+        </mat-form-field>
+        <button mat-flat-button type="submit">Save</button>
+    </form>
+</div>

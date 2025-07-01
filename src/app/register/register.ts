@@ -58,6 +58,7 @@ export class Register {
       await setDoc(doc(this.firestore, 'users', uid), {
         name, email, createdAt: new Date()
       });
+      await updateProfile(userCredential.user, { displayName: name });
       this.router.navigateByUrl('/');
     } catch (error: any) {
       this.errorMessage = error.message;

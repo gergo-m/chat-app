@@ -27,15 +27,7 @@ export class App {
   auth = inject(Auth);
   router = inject(Router);
 
-  constructor() {
-    onAuthStateChanged(this.auth, (user) => {
-    if (user) {
-      this.router.navigate(['/']);
-    } else {
-      this.router.navigate(['/login']);
-    }
-  });
-  }
+  constructor() {}
 
   get user() {
     return this.auth.currentUser;

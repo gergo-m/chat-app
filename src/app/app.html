@@ -1,11 +1,13 @@
 <mat-toolbar>
-  <mat-icon id="chat-icon">chat</mat-icon>
-  <span id="title">Chat App</span>
+  <mat-icon class="chat-icon">groups</mat-icon>
+  <span class="title">Chat App</span>
   @if (user) {
-  <button matButton (click)="logout()" id="logout-btn">Logout</button>
+    <button matButton [routerLink]="['/']" class="chatrooms-btn"><mat-icon>chat</mat-icon>Chatrooms</button>
+    <button matButton [routerLink]="['/profile']" class="profile-btn"><mat-icon>person</mat-icon>Profile</button>
+    <button matButton (click)="logout()" class="logout-btn"><mat-icon>logout</mat-icon>Logout</button>
   } @else {
-  <button matButton [routerLink]="['/login']" id="login-btn">Login</button>
-  <button matButton [routerLink]="['/register']" id="register-btn">Register</button>
+    <button matButton [routerLink]="['/login']" class="login-btn"><mat-icon>login</mat-icon>Login</button>
+    <button matButton [routerLink]="['/register']" class="register-btn"><mat-icon>app_registration</mat-icon>Register</button>
   }
 </mat-toolbar>
 <router-outlet></router-outlet>

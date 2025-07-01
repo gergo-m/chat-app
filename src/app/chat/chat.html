@@ -7,10 +7,31 @@
     </li>
     }
   </ul>
-  <form (submit)="addMessage(messageInput.value); messageInput.value=''">
+  <!--<form (submit)="addMessage(messageInput.value); messageInput.value=''">
     <mat-form-field>
       <input matInput #messageInput type="text" placeholder="Send a message...">
     </mat-form-field>
     <button matButton type="submit"><mat-icon>send</mat-icon></button>
+  </form>-->
+  @for (room of chatrooms$ | async; track room.id) {
+    <div class="chatroom">
+      <h3>{{ room.name }}</h3>
+      <p>{{ room.lastMessage }}</p>
+    </div>
+  }
+  <form [formGroup]="addRoomForm" (ngSubmit)="createChatroom(); nameInput.value=''">
+    <mat-form-field appearance="outline">
+      <mat-label>Chatroom name</mat-label>
+      <input matInput #nameInput formControlName="name" type="text">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Chat Type</mat-label>
+      <mat-select #typeInput formControlName="type">
+        <mat-option value="group">Group</mat-option>
+        <mat-option value="private">Private</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button mat-raised-button type="submit" [disabled]="addRoomForm.invalid"><mat-icon>add</mat-icon>Create Room</button>
   </form>
 </div>

@@ -11,6 +11,12 @@ import { MatButton } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { doc, getDoc } from '@firebase/firestore';
 import { UserProfile } from '../model/user';
+import { Room } from '../model/chatroom';
+import { Chatroom } from '../services/chatroom';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-chat',
@@ -19,7 +25,12 @@ import { UserProfile } from '../model/user';
     MatToolbarModule,
     MatIconModule,
     MatButton,
-    MatInputModule
+    MatInputModule,
+    MatFormFieldModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatSelectModule,
+    MatOptionModule
   ],
   templateUrl: './chat.html',
   styleUrl: './chat.scss'
@@ -37,13 +48,32 @@ export class Chat {
       : of(null)
     )
   );
+  chatroomCollection = collection(this.firestore, 'chatrooms');
+  chatrooms$: Observable<any[]>;
+  chatroomService = inject(Chatroom);
+
+  addRoomForm = new FormGroup({
+    name: new FormControl('', [Validators.required, Validators.minLength(1)]),
+    type: new FormControl('group', [Validators.required])
+  });
 
   constructor() {
     this.testMessages$ = collectionData(this.testCollection, { idField: 'id' });
+    this.chatrooms$ = collectionData(this.chatroomCollection, { idField: 'id' });
   }
 
   async addMessage(text: string) {
     if (!text.trim()) return;
     await addDoc(this.testCollection, { message: text });
+  }
+
+  async createChatroom() {
+    const name = this.addRoomForm.get('name')?.value || '';
+    const type = this.addRoomForm.get('type')?.value || 'group';
+    if (!this.auth.currentUser || !name.trim()) return;
+    const validTypes = ['group', 'private'] as const;
+    if (!validTypes.includes(type as any)) return;
+    this.chatroomService.createChatroom(name, type as "group" | "private", [this.auth.currentUser.uid]);
+    this.addRoomForm.reset({ type: 'group' });
   }
 }
