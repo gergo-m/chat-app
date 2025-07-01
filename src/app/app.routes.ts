@@ -20,7 +20,13 @@ export const routes: Routes = [
         canActivate: [UserGuard]
     },
     {
+        path: 'chatroom/:id',
+        loadComponent: () => import('./chatroom/chatroom').then(m => m.Chatroom),
+        canActivate: [UserGuard]
+    },
+    {
         path: '',
-        loadComponent: () => import('./chat/chat').then(m => m.Chat)
+        loadComponent: () => import('./chat/chat').then(m => m.Chat),
+        canActivate: [UserGuard]
     }
 ];

@@ -1,1 +1,24 @@
-<p>chatroom works!</p>
+<div class="chatroom-container">
+    <div class="chatroom-header">
+        <h2 class="chat-title">{{ (chatroom$ | async)?.name || 'Loading...' }}</h2>
+        <p class="members-count">Members: {{ (chatroom$ | async)?.members?.length || 0 }}</p>
+    </div>
+
+    <div class="messages-container">
+        @for (message of messagesWithSenders$ | async; track message.id) {
+            <div class="message">
+                {{ message.text }} ({{ message.senderName }})
+            </div>
+        } @empty {<p>No messages yet</p>}
+    </div>
+
+    <div class="send-message-container">
+        <form [formGroup]="sendForm" (ngSubmit)="sendMessage()">
+            <mat-form-field>
+                <mat-label>Send a message...</mat-label>
+                <input matInput formControlName="message" type="text">
+            </mat-form-field>
+            <button mat-flat-button type="submit">Send</button>
+        </form>
+    </div>
+</div>

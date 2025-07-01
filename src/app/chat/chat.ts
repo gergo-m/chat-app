@@ -12,7 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { doc, getDoc } from '@firebase/firestore';
 import { UserProfile } from '../model/user';
 import { Room } from '../model/chatroom';
-import { Chatroom } from '../services/chatroom';
+import { ChatroomService } from '../services/chatroom';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
@@ -50,7 +50,7 @@ export class Chat {
   );
   chatroomCollection = collection(this.firestore, 'chatrooms');
   chatrooms$: Observable<any[]>;
-  chatroomService = inject(Chatroom);
+  chatroomService = inject(ChatroomService);
 
   addRoomForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -75,5 +75,9 @@ export class Chat {
     if (!validTypes.includes(type as any)) return;
     this.chatroomService.createChatroom(name, type as "group" | "private", [this.auth.currentUser.uid]);
     this.addRoomForm.reset({ type: 'group' });
+  }
+
+  openChatroom(roomId: string) {
+    this.router.navigate(['/chatroom', roomId]);
   }
 }

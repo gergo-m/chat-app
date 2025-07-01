@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { collection, collectionData, deleteDoc, doc, Firestore, getDoc, query, setDoc, updateDoc, where } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { collection, collectionData, deleteDoc, doc, docData, Firestore, getDoc, query, setDoc, updateDoc, where } from '@angular/fire/firestore';
+import { combineLatest, map, Observable } from 'rxjs';
 import { Room } from '../model/chatroom';
 
 @Injectable({
   providedIn: 'root'
 })
-export class Chatroom {
+export class ChatroomService {
   firestore = inject(Firestore);
 
   constructor() { }
@@ -20,6 +20,11 @@ export class Chatroom {
       lastMessageTimestamp: new Date()
     });
     return chatroomRef.id;
+  }
+
+  getChatroom(roomId: string): Observable<Room | undefined> {
+    const chatroomRef = doc(this.firestore, 'chatrooms', roomId);
+    return docData(chatroomRef, { idField: 'id' }) as Observable<Room>;
   }
 
   getUserRooms(userId: string): Observable<Room[]> {
@@ -36,6 +41,16 @@ export class Chatroom {
 
   async deleteRoom(roomId: string) {
     await deleteDoc(doc(this.firestore, `chatrooms/${roomId}`));
+  }
+
+  getParticipantNames(userIds: string[]): Observable<string[]> {
+    const userObservables = userIds.map(uid =>
+      docData(doc(this.firestore, 'users', uid))
+    );
+
+    return combineLatest(userObservables).pipe(
+      map(users => users.map(user => user?.['name'] || 'Unknown'))
+    );
   }
 
   async getOrCreatePrivateRoom(user1: string, user2: string) {
