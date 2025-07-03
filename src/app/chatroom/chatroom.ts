@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
 import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
 import { Message } from '../model/message';
 import { ActivatedRoute } from '@angular/router';
@@ -12,10 +12,16 @@ import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
 import { UserProfile } from '../model/user';
+import { Auth, user, User } from '@angular/fire/auth';
+import { MatIconModule } from '@angular/material/icon';
 
 interface MessageWithSender extends Message {
   senderName?: string;
   senderProfile?: UserProfile;
+}
+
+interface MessageWithPrevSender extends MessageWithSender {
+  prev: MessageWithSender | null;
 }
 
 @Component({
@@ -27,7 +33,8 @@ interface MessageWithSender extends Message {
     MatLabel,
     MatInputModule,
     ReactiveFormsModule,
-    MatButton
+    MatButton,
+    MatIconModule
   ],
   templateUrl: './chatroom.html',
   styleUrl: './chatroom.scss'
@@ -36,16 +43,27 @@ export class Chatroom {
   route = inject(ActivatedRoute);
   firestore = inject(Firestore);
   messageService = inject(MessageService);
+  chatroomService = inject(ChatroomService);
+  auth = inject(Auth);
+  user$: Observable<User | null> = user(this.auth);
+  userProfile$: Observable<UserProfile | null> = this.user$.pipe(
+    switchMap(currentUser => currentUser
+      ? docData(doc(this.firestore, 'users', currentUser.uid)) as Observable<UserProfile>
+      : of(null)
+    )
+  );
   roomId = this.route.snapshot.params['id'];
+  // @Input() roomId!: string;
   messages$: Observable<Message[]> = this.messageService.getRoomMessages(this.roomId);
   chatroom$: Observable<Room | undefined> = this.route.params.pipe(
     switchMap(params => {
       const roomId = params['id'];
       return this.chatroomService.getChatroom(roomId);
     })
-  );
+  ); 
+  // chatroom$: Observable<Room | undefined> =  this.chatroomService.getChatroom(this.roomId);
 
-  messagesWithSenders$: Observable<MessageWithSender[]> = this.messageService.getRoomMessages(this.roomId).pipe(
+  messagesWithSenders$: Observable<MessageWithPrevSender[]> = this.messageService.getRoomMessages(this.roomId).pipe(
     switchMap(messages => {
       if (!messages || messages.length === 0) {
         return of([]);
@@ -61,10 +79,11 @@ export class Chatroom {
             }
           });
 
-          return messages.map(message => ({
+          return messages.map((message, i, arr) => ({
             ...message,
             senderName: senderMap.get(message.senderId)?.name || 'Unknown',
-            senderProfile: senderMap.get(message.senderId)
+            senderProfile: senderMap.get(message.senderId),
+            prev: i > 0 ? arr[i - 1] : null
           }))
         })
       )
@@ -75,13 +94,26 @@ export class Chatroom {
     message: new FormControl('', [Validators.required, Validators.minLength(1)])
   })
 
-  constructor(
-    private chatroomService: ChatroomService) {}
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLDivElement>;
+
+  constructor() {}
+  
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
 
   async sendMessage() {
     const messageValue = this.sendForm.get('message')?.value ?? '';
     if (!messageValue.trim()) return;
     this.messageService.sendMessage(this.roomId, messageValue);
     this.sendForm.reset();
+  }
+
+  private scrollToBottom(): void {
+    try {
+      this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+    } catch(error) {
+      console.log("Error while scrolling:", error);
+    }
   }
 }

@@ -4,21 +4,26 @@
         <p class="members-count">Members: {{ (chatroom$ | async)?.members?.length || 0 }}</p>
     </div>
 
-    <div class="messages-container">
-        @for (message of messagesWithSenders$ | async; track message.id) {
-            <div class="message">
-                {{ message.text }} ({{ message.senderName }})
+    <div class="messages-container" #messagesContainer>
+        @for (message of messagesWithSenders$ | async; track message.id; let i = $index) {
+            <div class="message-container">
+                @if (message.prev?.senderId !== message.senderId) {
+                    <div class="sender-name" [ngClass]="message.senderName == (userProfile$ | async)?.name ? 'self' : ''"> {{ message.senderName }} </div>
+                }
+                <div class="message" [ngClass]="message.senderName == (userProfile$ | async)?.name ? 'self' : ''">
+                    {{ message.text }}
+                </div>
             </div>
         } @empty {<p>No messages yet</p>}
     </div>
 
     <div class="send-message-container">
         <form [formGroup]="sendForm" (ngSubmit)="sendMessage()">
-            <mat-form-field>
+            <mat-form-field class="message-input">
                 <mat-label>Send a message...</mat-label>
                 <input matInput formControlName="message" type="text">
             </mat-form-field>
-            <button mat-flat-button type="submit">Send</button>
+            <button mat-flat-button type="submit" class="send-btn"><mat-icon>send</mat-icon></button>
         </form>
     </div>
 </div>

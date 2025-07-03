@@ -1,39 +1,19 @@
-<div class="main-container">
-  <h2>Hello, {{ (userProfile$ | async)?.name }}! Test messages from Firestore:</h2>
-  <ul>
-    @for (msg of testMessages$ | async; track msg.id) {
-    <li>
-      {{ msg.message }}
-    </li>
+<div class="chat-layout">
+  <div class="chat-list">
+    <h2>Hello, {{ (userProfile$ | async)?.name }}!</h2>
+    @for (room of userRooms$ | async; track room.id) {
+      <div (click)="openChatroom(room.id)" [class.selected]="room.id === openedRoomId" class="chatroom">
+        <h3>{{ room.name }}</h3>
+        <p>{{ formatLastMessage(room.lastMessage) }} ({{ formatTimestamp(room.lastMessageTimestamp) }})</p>
+      </div>
     }
-  </ul>
-  <!--<form (submit)="addMessage(messageInput.value); messageInput.value=''">
-    <mat-form-field>
-      <input matInput #messageInput type="text" placeholder="Send a message...">
-    </mat-form-field>
-    <button matButton type="submit"><mat-icon>send</mat-icon></button>
-  </form>-->
-  @for (room of chatrooms$ | async; track room.id) {
-    <div (click)="openChatroom(room.id)" class="chatroom">
-      <h3>{{ room.name }}</h3>
-      <p>{{ room.lastMessage }}</p>
+    <button mat-fab color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+  @if (openedRoomId) {
+    <div class="chat-detail">
+      <!--<app-chatroom [roomId]="openedRoomId"></app-chatroom>-->
     </div>
   }
-  <div class="create-chatroom-container">
-    <form [formGroup]="addRoomForm" (ngSubmit)="createChatroom(); nameInput.value=''" class="create-chatroom-form">
-      <mat-form-field appearance="outline">
-        <mat-label>Chatroom name</mat-label>
-        <input matInput #nameInput formControlName="name" type="text">
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Chat Type</mat-label>
-        <mat-select #typeInput formControlName="type">
-          <mat-option value="group">Group</mat-option>
-          <mat-option value="private">Private</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <button mat-raised-button type="submit" [disabled]="addRoomForm.invalid"><mat-icon>add</mat-icon>Create Room</button>
-    </form>
-  </div>
 </div>

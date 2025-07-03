@@ -1,6 +1,22 @@
-.main-container {
-    padding: 0 10px;
+.chat-layout {
+    display: flex;
+    height: 100vh;
 }
+.chat-list {
+    width: 300px;
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
+    background: #f7fafd;
+    padding: 20px 0;
+}
+.chat-detail {
+    flex: 1 1 auto;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
 .create-chatroom-container {
     max-width: 500px;
     margin: 50px 20px;
@@ -19,7 +35,7 @@
     color: red;
 }
 .chatroom {
-    max-width: 200px;
+    max-width: 300px;
     margin: 10px 5px;
     background-color: rgb(239, 247, 255);
     padding: 1px 20px;

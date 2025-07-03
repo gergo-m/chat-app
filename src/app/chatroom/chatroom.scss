@@ -1,6 +1,16 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
 .chatroom-container {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
     max-width: 500px;
-    margin: 50px 20px;
+    margin: 30px 50px;
     background-color: rgb(239, 247, 255);
     padding: 30px;
     border-radius: 12px;
@@ -22,10 +32,48 @@
     color: gray;
 }
 
+.messages-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    overflow-anchor: auto;
+}
+
+.sender-name {
+    width: fit-content;
+    margin: 15px 10px 0 10px;
+    color: rgb(167, 167, 167);
+    font-size: 13px;
+}
 .message {
     background-color: rgb(255, 255, 255);
     border-radius: 20px;
     padding: 8px 15px;
-    margin: 15px 0;
+    margin: 2px 0 5px 0;
+    width: fit-content;
+    max-width: 400px;
+}
+
+.self {
+    margin-left: auto;
+}
+.message.self {
+    background-color: lightblue;
+}
+
+.send-message-container {
+    margin: 20px 5px 0 5px;
+    max-width: 450px;
+}
+
+.message-input {
+    width: 370px;
+    margin-right: 10px;
+    border-radius: 15px;
+}
+
+.send-btn {
     width: fit-content;
 }
