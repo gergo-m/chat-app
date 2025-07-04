@@ -1,0 +1,31 @@
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
+import { map } from 'rxjs/operators';
+import { user } from '@angular/fire/auth';
+import { Observable } from 'rxjs';
+import { doc, Firestore, getDoc } from '@angular/fire/firestore';
+
+@Injectable({ providedIn: 'root' })
+export class ChatroomGuard implements CanActivate {
+  private auth = inject(Auth);
+  private router = inject(Router);
+  private firestore = inject(Firestore);
+
+  async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+    const roomId = route.params['id'];
+    const user = this.auth.currentUser;
+    if (!user) return this.router.parseUrl('/login');
+    const roomDoc = doc(this.firestore, 'chatrooms', roomId);
+    const roomSnap = await getDoc(roomDoc);
+    if (!roomSnap.exists()) {
+      return this.router.parseUrl('/');
+    }
+    const room = roomSnap.data() as any;
+
+    if (!Array.isArray(room.members) || !room.members.includes(user.uid)) {
+      return this.router.parseUrl('/');
+    }
+    return true;
+  }
+}

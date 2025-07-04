@@ -44,7 +44,6 @@ export class Login {
       const email = this.loginForm.get('email')?.value ||'';
       const password = this.loginForm.get('password')?.value ||'';
       await this.authService.login(email, password);
-      this.router.navigateByUrl('/');
     } catch (error: any) {
       switch (error.code) {
         case "auth/invalid-credential":

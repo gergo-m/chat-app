@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Register } from './auth/register/register';
 import { GuestGuard } from './guards/guest-guard';
 import { UserGuard } from './guards/user-guard';
+import { ChatroomGuard } from './guards/chatroom-guard-guard';
 
 export const routes: Routes = [
     {
@@ -22,7 +23,7 @@ export const routes: Routes = [
     {
         path: 'chatroom/:id',
         loadComponent: () => import('./chatroom/chatroom').then(m => m.Chatroom),
-        canActivate: [UserGuard]
+        canActivate: [ChatroomGuard]
     },
     {
         path: 'users', title: 'Users',
@@ -32,6 +33,12 @@ export const routes: Routes = [
     {
         path: '',
         loadComponent: () => import('./chat/chat').then(m => m.Chat),
-        canActivate: [UserGuard]
+        canActivate: [UserGuard],
+        pathMatch: 'full'
+    },
+    {
+        path: '**',
+        redirectTo: '',
+        pathMatch: 'full'
     }
 ];

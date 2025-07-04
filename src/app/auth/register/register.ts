@@ -59,7 +59,6 @@ export class Register {
         name, email, createdAt: new Date()
       });
       await updateProfile(userCredential.user, { displayName: name });
-      this.router.navigateByUrl('/');
     } catch (error: any) {
       this.errorMessage = error.message;
     }
@@ -78,6 +77,5 @@ export class Register {
       name, email, createdAt: new Date()
     });
     await updateProfile(user.user, { displayName: name });
-    this.router.navigateByUrl('/');
   }
 }

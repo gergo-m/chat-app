@@ -155,4 +155,17 @@ export class Chatroom {
     this.chatroomService.deleteRoom(this.roomId);
     this.router.navigateByUrl('');
   }
+
+  leaveChatroom(room: { name: string, members: string[] }) {
+    const currentUserId = this.auth.currentUser?.uid;
+    if (!currentUserId) return;
+    const currentMembers = Array.from(room.members);
+    const index = currentMembers.indexOf(currentUserId, 0);
+    if (index > -1) {
+      currentMembers.splice(index, 1);
+    }
+    const newMembers = Array.from(currentMembers);
+    this.chatroomService.updateRoom(this.roomId, room.name, newMembers);
+    this.router.navigateByUrl('');
+  }
 }

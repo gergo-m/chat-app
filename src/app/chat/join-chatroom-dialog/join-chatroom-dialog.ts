@@ -37,7 +37,8 @@ export class JoinChatroomDialog {
 
   submit() {
     const password = this.joinRoomForm.get('password')?.value || '';
-    if (this.joinRoomForm.valid && password && password === this.data.roomPassword) {
+    console.log(password, this.data.roomPassword);
+    if (this.joinRoomForm.valid && password === this.data.roomPassword) {
       this.dialogRef.close(this.joinRoomForm.value);
       this.joinRoomForm.reset({
         password: ''
