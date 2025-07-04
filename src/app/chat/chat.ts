@@ -23,6 +23,7 @@ import { Chatroom } from "../chatroom/chatroom";
 import { UserList } from "../user-list/user-list";
 import { getDatabase, onValue, ref } from '@firebase/database';
 import { getTimestampMillis, formatTimestamp } from '../util/util';
+import { JoinChatroomDialog } from './join-chatroom-dialog/join-chatroom-dialog';
 
 @Component({
   selector: 'app-chat',
@@ -188,8 +189,30 @@ export class Chat {
     this.addRoomForm.reset({ type: 'private' });
   }
 
-  openChatroom(roomId: string) {
-    this.router.navigate(['/chatroom', roomId]);
+  openOrJoinChatroom(room: {id: string, name: string, visibility: string, members: string[], password: string}) {
+    const currentUserId = this.auth.currentUser?.uid;
+    if (!currentUserId) return;
+    if (room.members.includes(currentUserId)) {
+      this.router.navigate(['/chatroom', room.id]);
+    } else {
+      const dialogRef = this.dialog.open(JoinChatroomDialog, {
+        width: '400px',
+        data: {
+          roomName: room.name,
+          roomVisibility: room.visibility,
+          roomPassword: room.password
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          if (room.password !== result.password) return;
+          const newMembers = Array.from(new Set([...(room.members || []), currentUserId]));
+          this.chatroomService.updateRoom(room.id, room.name, newMembers);
+          this.router.navigate(['/chatroom', room.id]);
+        }
+      });
+    }
     // this.openedRoomId = roomId;
   }
 
@@ -207,6 +230,6 @@ export class Chat {
   }
 
   isRestrictedAccess(room: { visibility: string, members: string[] }) {
-    return room.visibility === 'password' || (room.visibility === 'public' && !this.isUserMember(room))
+    return (room.visibility === 'password' && !this.isUserMember(room)) || (room.visibility === 'public' && !this.isUserMember(room));
   }
 }

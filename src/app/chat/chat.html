@@ -2,7 +2,7 @@
   <div class="chat-list">
     <h2>Hello, {{ (userProfile$ | async)?.name }}!</h2>
     @for (room of displayRooms$ | async; track room.id) {
-      <div (click)="openChatroom(room.id)" [class.selected]="room.id === openedRoomId" class="chatroom">
+      <div (click)="openOrJoinChatroom(room)" [class.selected]="room.id === openedRoomId" class="chatroom">
         <h3>
           @if (room.type === 'group') {
             <mat-icon class="group-icon">group</mat-icon>
