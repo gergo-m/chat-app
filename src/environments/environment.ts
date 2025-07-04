@@ -6,6 +6,7 @@ export const environment = {
         projectId: "chat-app-5efc6",
         storageBucket: "chat-app-5efc6.firebasestorage.app",
         messagingSenderId: "89212423848",
-        appId: "1:89212423848:web:350da59ace7057e9e4fc9d"
+        appId: "1:89212423848:web:350da59ace7057e9e4fc9d",
+        databaseURL: "https://chat-app-5efc6-default-rtdb.europe-west1.firebasedatabase.app"
     }
 };

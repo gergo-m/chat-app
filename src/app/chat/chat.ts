@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Auth, user } from '@angular/fire/auth';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { User } from 'firebase/auth';
 import { Firestore, collection, collectionData, addDoc, docData } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { firstValueFrom, Observable, of, switchMap } from 'rxjs';
+import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { doc, getDoc, query, where } from '@firebase/firestore';
 import { UserProfile } from '../model/user';
@@ -20,6 +20,8 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateChatroomDialog } from './create-chatroom-dialog/create-chatroom-dialog';
 import { Chatroom } from "../chatroom/chatroom";
+import { UserList } from "../user-list/user-list";
+import { getDatabase, onValue, ref } from '@firebase/database';
 
 @Component({
   selector: 'app-chat',
@@ -27,7 +29,7 @@ import { Chatroom } from "../chatroom/chatroom";
     CommonModule,
     MatToolbarModule,
     MatIconModule,
-    MatButton,
+    MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
     FormsModule,
@@ -35,7 +37,7 @@ import { Chatroom } from "../chatroom/chatroom";
     MatSelectModule,
     MatOptionModule,
     MatDialogModule,
-    Chatroom
+    UserList
 ],
   templateUrl: './chat.html',
   styleUrl: './chat.scss'
@@ -65,18 +67,20 @@ export class Chat {
       );
       return collectionData(q, { idField: 'id' }) as Observable<any[]>;
     })
-  )
+  );
   userCollection = collection(this.firestore, 'users');
   users$: Observable<any[]>;
   usersArray: any[] = [];
   openedRoomId: string | null = null;
+  displayRooms$: Observable<any[]>;
+  onlineUids: string[] = [];
 
   
   addRoomForm: FormGroup = new FormGroup({
-        name: new FormControl('', [Validators.required, Validators.minLength(1)]),
-        type: new FormControl('group', [Validators.required]),
-        participants: new FormControl([], [Validators.required])
-      });
+    name: new FormControl('', [Validators.required, Validators.minLength(1)]),
+    type: new FormControl('group', [Validators.required]),
+    participants: new FormControl([], [Validators.required])
+  });
 
   constructor(private dialog: MatDialog) {
     this.testMessages$ = collectionData(this.testCollection, { idField: 'id' });
@@ -90,6 +94,37 @@ export class Chat {
         participants: new FormControl(initialParticipants, [Validators.required])
       });
     });
+    const statusRef = ref(getDatabase(), '/status');
+    onValue(statusRef, (snapshot) => {
+      this.onlineUids = Object.keys(snapshot.val() || {}).filter(
+        uid => snapshot.val()[uid].state === 'online'
+      );
+    });
+    this.displayRooms$ = combineLatest([
+      this.userRooms$,
+      this.user$,
+      this.users$
+    ]).pipe(
+      map(([rooms, currentUser, users]) => {
+        return rooms.map(room => {
+          if (room.type === 'private' && Array.isArray(room.members) && currentUser) {
+            const otherUid = room.members.find((uid: string) => uid !== currentUser.uid);
+            const otherUser = users.find((u: any) => u.id === otherUid);
+            return {
+              ...room,
+              name: otherUser ? otherUser.name : 'Uknown room',
+              otherUid: otherUid
+            };
+          } else {
+            return {
+              ...room,
+              name: room.name,
+              otherUid: ''
+            };
+          }
+        })
+      })
+    )
   }
 
   ngOnInit() {

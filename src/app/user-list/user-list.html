@@ -1,0 +1,9 @@
+<div class="user-list">
+    <h2>Displaying all users:</h2>
+    @for (user of users$ | async; track user.id) {
+        <div (click)="openPrivateChat(user.id)" class="user">
+            <h3>{{ user.name }}</h3>
+            <p>{{ onlineUids.includes(user.id) ? 'online' : 'offline' }}</p>
+        </div>
+    }
+</div>

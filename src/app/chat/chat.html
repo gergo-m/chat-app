@@ -1,9 +1,9 @@
 <div class="chat-layout">
   <div class="chat-list">
     <h2>Hello, {{ (userProfile$ | async)?.name }}!</h2>
-    @for (room of userRooms$ | async; track room.id) {
+    @for (room of displayRooms$ | async; track room.id) {
       <div (click)="openChatroom(room.id)" [class.selected]="room.id === openedRoomId" class="chatroom">
-        <h3>{{ room.name }}</h3>
+        <h3>@if (room.type === 'group') {<mat-icon class="group-icon">group</mat-icon>} @else if (room.type === 'private') {<mat-icon class="private-icon" [ngClass]="onlineUids.includes(room.otherUid) ? 'online-icon' : ''">person</mat-icon>} {{ room.name }}</h3>
         <p>{{ formatLastMessage(room.lastMessage) }} ({{ formatTimestamp(room.lastMessageTimestamp) }})</p>
       </div>
     }
@@ -11,9 +11,10 @@
       <mat-icon>add</mat-icon>
     </button>
   </div>
-  @if (openedRoomId) {
+  <!--@if (openedRoomId) {-->
     <div class="chat-detail">
+      <app-user-list></app-user-list>
       <!--<app-chatroom [roomId]="openedRoomId"></app-chatroom>-->
     </div>
-  }
+  <!--}-->
 </div>

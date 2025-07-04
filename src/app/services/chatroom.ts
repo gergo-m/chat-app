@@ -62,9 +62,12 @@ export class ChatroomService {
 
     if (!roomSnap.exists()) {
       await setDoc(roomRef, {
+        name: 'Private chat',
         type: 'private',
         members: [user1, user2],
-        createdAt: new Date()
+        createdAt: new Date(),
+        lastMessage: '',
+        lastMessageTimestamp: new Date()
       });
     }
     return roomId;

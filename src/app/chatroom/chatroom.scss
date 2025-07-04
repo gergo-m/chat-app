@@ -23,6 +23,8 @@ html, body {
     border-radius: 6px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
     margin-bottom: 30px;
+    display: flex;
+    flex-direction: row;
 }
 .chat-title {
     margin-bottom: 0;
@@ -30,6 +32,15 @@ html, body {
 .members-count {
     margin-top: 5px;
     color: gray;
+}
+.actions {
+    margin: auto 0 auto auto;
+}
+button > mat-icon {
+    margin: auto;
+}
+button {
+    padding: 0;
 }
 
 .messages-container {

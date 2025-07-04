@@ -1,17 +1,17 @@
 import { Routes } from '@angular/router';
-import { Register } from './register/register';
+import { Register } from './auth/register/register';
 import { GuestGuard } from './guards/guest-guard';
 import { UserGuard } from './guards/user-guard';
 
 export const routes: Routes = [
     {
         path: 'register', title: 'Register',
-        loadComponent: () => import('./register/register').then(m => m.Register),
+        loadComponent: () => import('./auth/register/register').then(m => m.Register),
         canActivate: [GuestGuard]
     },
     {
         path: 'login', title: 'Login',
-        loadComponent: () => import('./login/login').then(m => m.Login),
+        loadComponent: () => import('./auth/login/login').then(m => m.Login),
         canActivate: [GuestGuard]
     },
     {
@@ -22,6 +22,11 @@ export const routes: Routes = [
     {
         path: 'chatroom/:id',
         loadComponent: () => import('./chatroom/chatroom').then(m => m.Chatroom),
+        canActivate: [UserGuard]
+    },
+    {
+        path: 'users', title: 'Users',
+        loadComponent: () => import('./user-list/user-list').then(m => m.UserList),
         canActivate: [UserGuard]
     },
     {

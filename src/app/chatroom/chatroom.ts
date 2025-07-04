@@ -1,7 +1,7 @@
 import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
 import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
 import { Message } from '../model/message';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { MessageService } from '../services/message';
 import { ChatroomService } from '../services/chatroom';
 import { doc, docData, Firestore } from '@angular/fire/firestore';
@@ -45,6 +45,7 @@ export class Chatroom {
   messageService = inject(MessageService);
   chatroomService = inject(ChatroomService);
   auth = inject(Auth);
+  router = inject(Router);
   user$: Observable<User | null> = user(this.auth);
   userProfile$: Observable<UserProfile | null> = this.user$.pipe(
     switchMap(currentUser => currentUser
@@ -115,5 +116,10 @@ export class Chatroom {
     } catch(error) {
       console.log("Error while scrolling:", error);
     }
+  }
+
+  deleteChatroom() {
+    this.chatroomService.deleteRoom(this.roomId);
+    this.router.navigateByUrl('');
   }
 }

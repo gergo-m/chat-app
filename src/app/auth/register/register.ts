@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatButtonModule } from '@angular/material/button';
@@ -67,6 +67,17 @@ export class Register {
 
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(this.auth, provider);
+    const user = await signInWithPopup(this.auth, provider);
+    const uid = user.user.uid;
+    const name = user.user.displayName;
+    const email = user.user.email;
+    console.log(user);
+    console.log(user.user);
+    console.log(user.user.email);
+    await setDoc(doc(this.firestore, 'users', uid), {
+      name, email, createdAt: new Date()
+    });
+    await updateProfile(user.user, { displayName: name });
+    this.router.navigateByUrl('/');
   }
 }

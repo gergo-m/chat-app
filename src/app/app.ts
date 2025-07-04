@@ -7,6 +7,7 @@ import { Auth } from '@angular/fire/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { Firestore } from '@angular/fire/firestore';
 import { MatButton } from '@angular/material/button';
+import { PresenceService } from './services/presence';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +28,7 @@ export class App {
   auth = inject(Auth);
   router = inject(Router);
 
-  constructor() {}
+  constructor(private presence: PresenceService) {}
 
   get user() {
     return this.auth.currentUser;
