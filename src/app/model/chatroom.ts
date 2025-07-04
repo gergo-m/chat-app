@@ -5,5 +5,7 @@ export interface Room {
     members: string[];
     createdAt: Date;
     lastMessage: string;
-    lastMessageTimestamp: Date;
+    lastMessageTimestamp: { seconds: number, nanoseconds: number } | Date | string;
+    visibility: 'public' | 'private' | 'password';
+    password?: string;
 }

@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
-  selector: 'app-create-chatroom-dialog',
+  selector: 'app-update-chatroom-dialog',
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -23,33 +23,29 @@ import { MatSelectModule } from '@angular/material/select';
     CommonModule,
     MatDialogModule
   ],
-  templateUrl: './create-chatroom-dialog.html',
-  styleUrl: './create-chatroom-dialog.scss'
+  templateUrl: './update-chatroom-dialog.html',
+  styleUrl: './update-chatroom-dialog.scss'
 })
-export class CreateChatroomDialog {
-  addRoomForm: FormGroup;
+export class UpdateChatroomDialog {
+  updateRoomForm: FormGroup;
 
   constructor(
-    public dialogRef: MatDialogRef<CreateChatroomDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: { users: any[], currentUserId: string }
+    public dialogRef: MatDialogRef<UpdateChatroomDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: { users: any[], currentUserId: string, currentName: string, currentParticipants: any[] }
   ) {
-    this.addRoomForm = new FormGroup({
-        name: new FormControl('', [Validators.required, Validators.minLength(1)]),
-        visibility: new FormControl('private', [Validators.required]),
-        password: new FormControl('', [Validators.minLength(2)]),
-        participants: new FormControl(data.currentUserId ? [data.currentUserId] : [], [Validators.required])
+    this.updateRoomForm = new FormGroup({
+        name: new FormControl(data.currentName, [Validators.required, Validators.minLength(1)]),
+        participants: new FormControl(data.currentParticipants ? data.currentParticipants : [], [Validators.required])
       });
   }
 
   submit() {
-    if (this.addRoomForm.valid) {
-      this.dialogRef.close(this.addRoomForm.value);
-      this.addRoomForm.reset({
+    if (this.updateRoomForm.valid) {
+      this.dialogRef.close(this.updateRoomForm.value);
+      this.updateRoomForm.reset({
         name: '',
         type: 'group',
-        visibility: 'private',
-        password: '',
-        participants: [this.data.currentUserId]
+        participants: this.data.currentParticipants
       });
     }
   }

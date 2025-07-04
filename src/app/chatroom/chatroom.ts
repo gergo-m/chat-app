@@ -4,7 +4,7 @@ import { Message } from '../model/message';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { MessageService } from '../services/message';
 import { ChatroomService } from '../services/chatroom';
-import { doc, docData, Firestore } from '@angular/fire/firestore';
+import { collection, collectionData, doc, docData, Firestore } from '@angular/fire/firestore';
 import { Room } from '../model/chatroom';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,6 +14,8 @@ import { MatButton } from '@angular/material/button';
 import { UserProfile } from '../model/user';
 import { Auth, user, User } from '@angular/fire/auth';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { UpdateChatroomDialog } from './update-chatroom-dialog/update-chatroom-dialog';
 
 interface MessageWithSender extends Message {
   senderName?: string;
@@ -61,8 +63,11 @@ export class Chatroom {
       const roomId = params['id'];
       return this.chatroomService.getChatroom(roomId);
     })
-  ); 
+  );
   // chatroom$: Observable<Room | undefined> =  this.chatroomService.getChatroom(this.roomId);
+  userCollection = collection(this.firestore, 'users');
+  users$: Observable<any[]>;
+  usersArray: any[] = [];
 
   messagesWithSenders$: Observable<MessageWithPrevSender[]> = this.messageService.getRoomMessages(this.roomId).pipe(
     switchMap(messages => {
@@ -97,8 +102,16 @@ export class Chatroom {
 
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLDivElement>;
 
-  constructor() {}
+  constructor(private dialog: MatDialog) {
+    this.users$ = collectionData(this.userCollection, { idField: 'id' });
+  }
   
+  ngOnInit() {
+    this.users$.pipe().subscribe(users => {
+        this.usersArray = users;
+    });
+  }
+
   ngAfterViewChecked() {
     this.scrollToBottom();
   }
@@ -116,6 +129,26 @@ export class Chatroom {
     } catch(error) {
       console.log("Error while scrolling:", error);
     }
+  }
+
+  async openUpdateChatroomDialog(currentName: string, currentParticipants: any[]) {
+    const currentUserId = this.auth.currentUser?.uid;
+
+    const dialogRef = this.dialog.open(UpdateChatroomDialog, {
+      width: '400px',
+      data: {
+        users: this.usersArray,
+        currentUserId,
+        currentName,
+        currentParticipants
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.chatroomService.updateRoom(this.roomId, result.name, result.participants);
+      }
+    })
   }
 
   deleteChatroom() {

@@ -7,12 +7,20 @@
         </mat-form-field>
 
         <mat-form-field>
-            <mat-label>Chat Type</mat-label>
-            <mat-select #typeInput formControlName="type">
-                <mat-option value="group">Group</mat-option>
-                <mat-option value="private">Private</mat-option>
+            <mat-label>Chat Visibility</mat-label>
+            <mat-select #visibilityInput formControlName="visibility">
+                <mat-option value="public">Public</mat-option>
+                <mat-option value="private" selected>Private</mat-option>
+                <mat-option value="password">Password protected</mat-option>
             </mat-select>
         </mat-form-field>
+
+        @if (visibilityInput.value === 'password') {
+            <mat-form-field appearance="outline">
+                <mat-label>Password</mat-label>
+                <input matInput #passwordInput formControlName="password" type="password">
+            </mat-form-field>
+        }
 
         <mat-form-field>
             <mat-label>Invite People</mat-label>

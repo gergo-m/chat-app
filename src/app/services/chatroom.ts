@@ -11,13 +11,15 @@ export class ChatroomService {
 
   constructor() { }
 
-  async createChatroom(name: string, type: 'group' | 'private', members: string[]) {
+  async createChatroom(name: string, type: 'group' | 'private', visibility: 'public' | 'private' | 'password', password: string, members: string[]) {
     const chatroomRef = doc(collection(this.firestore, 'chatrooms'));
+    console.log(visibility, password);
     await setDoc(chatroomRef, {
       name, type, members,
       createdAt: new Date(),
       lastMessage: '',
-      lastMessageTimestamp: new Date()
+      lastMessageTimestamp: new Date(),
+      visibility, password
     });
     return chatroomRef.id;
   }
@@ -35,8 +37,8 @@ export class ChatroomService {
     return collectionData(q, { idField: 'id' }) as Observable<Room[]>;
   }
 
-  async updateRoomName(roomId: string, newName: string) {
-    await updateDoc(doc(this.firestore, `chatrooms/${roomId}`), { name: newName });
+  async updateRoom(roomId: string, newName: string, newMembers: string[]) {
+    await updateDoc(doc(this.firestore, `chatrooms/${roomId}`), { name: newName, members: newMembers });
   }
 
   async deleteRoom(roomId: string) {
@@ -67,7 +69,9 @@ export class ChatroomService {
         members: [user1, user2],
         createdAt: new Date(),
         lastMessage: '',
-        lastMessageTimestamp: new Date()
+        lastMessageTimestamp: new Date(),
+        visibility: 'private',
+        password: ''
       });
     }
     return roomId;

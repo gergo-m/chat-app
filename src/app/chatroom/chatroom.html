@@ -6,6 +6,7 @@
         </div>
         <div class="actions">
             @if ((chatroom$ | async)?.type === 'group') {
+                <button mat-raised-button *ngIf="chatroom$ | async as currentRoom" (click)="openUpdateChatroomDialog(currentRoom.name, currentRoom.members)"><mat-icon>edit</mat-icon></button>
                 <button mat-raised-button (click)="deleteChatroom()"><mat-icon>delete</mat-icon></button>
             }
         </div>

@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Update Chatroom</h2>
+<form [formGroup]="updateRoomForm" (ngSubmit)="submit(); nameInput.value=''" class="update-chatroom-form">
+    <mat-dialog-content>
+        <mat-form-field appearance="outline">
+            <mat-label>Chatroom name</mat-label>
+            <input matInput #nameInput formControlName="name" type="text">
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Manage Members</mat-label>
+            <mat-select #participantInput formControlName="participants" multiple>
+                @for (user of data.users; track user.id) {
+                    <mat-option [value]="user.id" [disabled]="user.id === data.currentUserId">{{ user.name }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </mat-dialog-content>
+    <div mat-dialog-actions>
+        <button mat-button type="button" (click)="close()">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="updateRoomForm.invalid"><mat-icon>check</mat-icon>Update Room</button>
+    </div>
+</form>

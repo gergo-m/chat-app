@@ -9,7 +9,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { doc, getDoc, query, where } from '@firebase/firestore';
+import { doc, getDoc, orderBy, query, where } from '@firebase/firestore';
 import { UserProfile } from '../model/user';
 import { Room } from '../model/chatroom';
 import { ChatroomService } from '../services/chatroom';
@@ -22,6 +22,7 @@ import { CreateChatroomDialog } from './create-chatroom-dialog/create-chatroom-d
 import { Chatroom } from "../chatroom/chatroom";
 import { UserList } from "../user-list/user-list";
 import { getDatabase, onValue, ref } from '@firebase/database';
+import { getTimestampMillis, formatTimestamp } from '../util/util';
 
 @Component({
   selector: 'app-chat',
@@ -61,11 +62,30 @@ export class Chat {
   userRooms$: Observable<any[]> = this.user$.pipe(
     switchMap(currentUser => {
       if (!currentUser) return of([]);
-      const q = query(
+
+      const visibleRoomsQuery = query(
         collection(this.firestore, 'chatrooms'),
+        where('visibility', 'in', ['public', 'password'])
+      );
+      const publicRooms$ = collectionData(visibleRoomsQuery, { idField: 'id' }) as Observable<Room[]>;
+
+      const memberRoomsQuery = query(
+        collection(this.firestore, 'chatrooms'),
+        where('visibility', '==', 'private'),
         where('members', 'array-contains', currentUser.uid)
       );
-      return collectionData(q, { idField: 'id' }) as Observable<any[]>;
+      const memberRooms$ = collectionData(memberRoomsQuery, { idField: 'id' }) as Observable<Room[]>;
+
+      return combineLatest([publicRooms$, memberRooms$]).pipe(
+        map(([publicRooms, memberRooms]) => {
+          const allRooms = [...publicRooms, ...memberRooms];
+          return allRooms.sort((a, b) => {
+            const aTime = getTimestampMillis(a.lastMessageTimestamp);
+            const bTime = getTimestampMillis(b.lastMessageTimestamp);
+            return bTime - aTime;
+          })
+        })
+      );
     })
   );
   userCollection = collection(this.firestore, 'users');
@@ -74,7 +94,7 @@ export class Chat {
   openedRoomId: string | null = null;
   displayRooms$: Observable<any[]>;
   onlineUids: string[] = [];
-
+  formatTimestamp = formatTimestamp;
   
   addRoomForm: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -151,20 +171,21 @@ export class Chat {
     
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.chatroomService.createChatroom(result.name, result.type, result.participants);
+        this.chatroomService.createChatroom(result.name, 'group', result.visibility, result.password, result.participants);
       }
     });
   }
 
   async createChatroom() {
     const name = this.addRoomForm.get('name')?.value || '';
-    const type = this.addRoomForm.get('type')?.value || 'group';
+    const visibility = this.addRoomForm.get('visibility')?.value || 'private';
+    const password = this.addRoomForm.get('password')?.value || '';
     const participants = this.addRoomForm.get('participants')?.value || [];
     if (!this.auth.currentUser || !name.trim()) return;
-    const validTypes = ['group', 'private'] as const;
-    if (!validTypes.includes(type as any)) return;
-    this.chatroomService.createChatroom(name, type as "group" | "private", participants);
-    this.addRoomForm.reset({ type: 'group' });
+    const validVisibilities = ['public', 'private', 'password'] as const;
+    if (!validVisibilities.includes(visibility as any)) return;
+    this.chatroomService.createChatroom(name, 'group', visibility as 'public' | 'private' | 'password', password, participants);
+    this.addRoomForm.reset({ type: 'private' });
   }
 
   openChatroom(roomId: string) {
@@ -174,13 +195,6 @@ export class Chat {
 
   formatLastMessage(msg: string) {
     return msg.length > 32 ? msg.slice(0, 33).trim() + '...' : msg;
-  }
-
-  formatTimestamp(timestamp: { seconds: number, nanoseconds: number }) {
-    const date = new Date(timestamp.seconds * 1000);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
   }
 
   isCurrentUser(userId: string) {

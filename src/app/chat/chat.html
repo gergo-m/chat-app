@@ -3,7 +3,14 @@
     <h2>Hello, {{ (userProfile$ | async)?.name }}!</h2>
     @for (room of displayRooms$ | async; track room.id) {
       <div (click)="openChatroom(room.id)" [class.selected]="room.id === openedRoomId" class="chatroom">
-        <h3>@if (room.type === 'group') {<mat-icon class="group-icon">group</mat-icon>} @else if (room.type === 'private') {<mat-icon class="private-icon" [ngClass]="onlineUids.includes(room.otherUid) ? 'online-icon' : ''">person</mat-icon>} {{ room.name }}</h3>
+        <h3>
+          @if (room.type === 'group') {
+            <mat-icon class="group-icon">group</mat-icon>
+          } @else if (room.type === 'private') {
+            <mat-icon class="private-icon" [ngClass]="onlineUids.includes(room.otherUid) ? 'online-icon' : ''">person</mat-icon>
+          }
+          {{ room.name }}
+        </h3>
         <p>{{ formatLastMessage(room.lastMessage) }} ({{ formatTimestamp(room.lastMessageTimestamp) }})</p>
       </div>
     }
