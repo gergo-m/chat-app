@@ -50,6 +50,14 @@ h3 {
     display: flex;
     flex-direction: row;
     gap: 5px;
+    margin-bottom: 0;
+}
+.last-message {
+    margin-top: 5px;
+    color: darkslategray;
+}
+.special-access {
+    font-style: italic;
 }
 .group-icon {
     margin-right: 5px;

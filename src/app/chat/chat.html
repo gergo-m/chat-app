@@ -11,7 +11,13 @@
           }
           {{ room.name }}
         </h3>
-        <p>{{ formatLastMessage(room.lastMessage) }} ({{ formatTimestamp(room.lastMessageTimestamp) }})</p>
+        <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : ''">
+        @if (isRestrictedAccess(room)) {
+          {{ "Restricted access" }}
+        } @else {
+          {{ formatLastMessage(room.lastMessage) }} ({{ formatTimestamp(room.lastMessageTimestamp) }})
+        }
+        </p>
       </div>
     }
     <button mat-fab color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">

@@ -76,4 +76,12 @@ export class ChatroomService {
     }
     return roomId;
   }
+
+  async isUserMember(roomId: string, userId: string): Promise<boolean> {
+    const roomDocRef = doc(this.firestore, 'chatrooms', roomId);
+    const roomSnap = await getDoc(roomDocRef);
+    if (!roomSnap.exists()) return false;
+    const roomData = roomSnap.data() as { members?: string[] };
+    return Array.isArray(roomData.members) && roomData.members.includes(userId);
+  }
 }

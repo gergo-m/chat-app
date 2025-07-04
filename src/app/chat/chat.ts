@@ -200,4 +200,13 @@ export class Chat {
   isCurrentUser(userId: string) {
     return userId == this.auth.currentUser?.uid;
   }
+
+  isUserMember(room: { members: string[] }): boolean {
+    if (!this.auth.currentUser) return false;
+    return Array.isArray(room.members) && room.members.includes(this.auth.currentUser.uid);
+  }
+
+  isRestrictedAccess(room: { visibility: string, members: string[] }) {
+    return room.visibility === 'password' || (room.visibility === 'public' && !this.isUserMember(room))
+  }
 }
