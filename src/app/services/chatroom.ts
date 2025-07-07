@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { collection, collectionData, deleteDoc, doc, docData, Firestore, getDoc, query, setDoc, updateDoc, where } from '@angular/fire/firestore';
 import { combineLatest, map, Observable } from 'rxjs';
 import { Room } from '../model/chatroom';
+import { Collection } from '../util/constant';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class ChatroomService {
   constructor() { }
 
   async createChatroom(name: string, type: 'group' | 'private', visibility: 'public' | 'private' | 'password', password: string, members: string[]) {
-    const chatroomRef = doc(collection(this.firestore, 'chatrooms'));
+    const chatroomRef = doc(collection(this.firestore, Collection.CHATROOMS));
     console.log(visibility, password);
     await setDoc(chatroomRef, {
       name, type, members,
@@ -25,7 +26,7 @@ export class ChatroomService {
   }
 
   getChatroom(roomId: string): Observable<Room | undefined> {
-    const chatroomRef = doc(this.firestore, 'chatrooms', roomId);
+    const chatroomRef = doc(this.firestore, Collection.CHATROOMS, roomId);
     return docData(chatroomRef, { idField: 'id' }) as Observable<Room>;
   }
 
@@ -47,7 +48,7 @@ export class ChatroomService {
 
   getParticipantNames(userIds: string[]): Observable<string[]> {
     const userObservables = userIds.map(uid =>
-      docData(doc(this.firestore, 'users', uid))
+      docData(doc(this.firestore, Collection.USERS, uid))
     );
 
     return combineLatest(userObservables).pipe(
@@ -78,7 +79,7 @@ export class ChatroomService {
   }
 
   async isUserMember(roomId: string, userId: string): Promise<boolean> {
-    const roomDocRef = doc(this.firestore, 'chatrooms', roomId);
+    const roomDocRef = doc(this.firestore, Collection.CHATROOMS, roomId);
     const roomSnap = await getDoc(roomDocRef);
     if (!roomSnap.exists()) return false;
     const roomData = roomSnap.data() as { members?: string[] };

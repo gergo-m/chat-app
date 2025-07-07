@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Auth, GoogleAuthProvider } from '@angular/fire/auth';
 import { signInWithPopup } from '@firebase/auth';
+import { ErrorMessage } from '../../util/constant';
 
 @Component({
   selector: 'app-login',
@@ -38,7 +39,7 @@ export class Login {
   async login() {
     try {
       if (this.loginForm.invalid) {
-        this.errorMessage = "Please correct the form errors.";
+        this.errorMessage = ErrorMessage.FORM_ERROR;
         return;
       }
       const email = this.loginForm.get('email')?.value ||'';
@@ -48,13 +49,13 @@ export class Login {
       if (error && typeof error === 'object' && 'code' in error) {
         switch (error.code) {
           case "auth/invalid-credential":
-            this.errorMessage = "Invalid email or password";
+            this.errorMessage = ErrorMessage.INVALID_CRED;
             break;
           default:
-            this.errorMessage = "Authentication failed. Please try again.";
+            this.errorMessage = ErrorMessage.AUTH_FAILED;
         }
       } else {
-        this.errorMessage = "An unexpected error occurred."
+        this.errorMessage = ErrorMessage.UNEXPECTED_ERR;
       }
     }
   }

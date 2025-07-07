@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
 import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
 import { Message } from '../model/message';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,6 +16,8 @@ import { Auth, user, User } from '@angular/fire/auth';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateChatroomDialog } from './update-chatroom-dialog/update-chatroom-dialog';
+import { getCurrentUser } from '../util/util';
+import { Collection } from '../util/constant';
 
 interface MessageWithSender extends Message {
   senderName?: string;
@@ -49,27 +51,42 @@ export class Chatroom {
   auth = inject(Auth);
   router = inject(Router);
   user$: Observable<User | null> = user(this.auth);
-  userProfile$: Observable<UserProfile | null> = this.user$.pipe(
-    switchMap(currentUser => currentUser
-      ? docData(doc(this.firestore, 'users', currentUser.uid)) as Observable<UserProfile>
-      : of(null)
-    )
-  );
-  roomId = this.route.snapshot.params['id'];
-  // @Input() roomId!: string;
-  messages$: Observable<Message[]> = this.messageService.getRoomMessages(this.roomId);
-  chatroom$: Observable<Room | undefined> = this.route.params.pipe(
+  userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
+  // roomId = this.route.snapshot.params['id'];
+  @Input() roomId!: string;
+  chatroom$!: Observable<Room | undefined>; /* = this.route.params.pipe(
     switchMap(params => {
       const roomId = params['id'];
-      return this.chatroomService.getChatroom(roomId);
+      return this.chatroomService.getChatroom(this.roomId);
     })
-  );
+  ); */
   // chatroom$: Observable<Room | undefined> =  this.chatroomService.getChatroom(this.roomId);
-  userCollection = collection(this.firestore, 'users');
+  userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<UserProfile[]>;
   usersArray: UserProfile[] = [];
 
-  messagesWithSenders$: Observable<MessageWithPrevSender[]> = this.messageService.getRoomMessages(this.roomId).pipe(
+  messagesWithSenders$!: Observable<MessageWithPrevSender[]>;
+
+  sendForm = new FormGroup({
+    message: new FormControl('', [Validators.required, Validators.minLength(1)])
+  });
+
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLDivElement>;
+
+  constructor(private dialog: MatDialog) {
+    this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
+  }
+  
+  ngOnInit() {
+    this.users$.pipe().subscribe(users => {
+        this.usersArray = users;
+    });
+  }
+
+  ngOnChanges() {
+    if (this.roomId) {
+      this.chatroom$ = this.chatroomService.getChatroom(this.roomId);
+      this.messagesWithSenders$ = this.messageService.getRoomMessages(this.roomId).pipe(
     switchMap(messages => {
       if (!messages || messages.length === 0) {
         return of([]);
@@ -95,21 +112,7 @@ export class Chatroom {
       )
     })
   )
-
-  sendForm = new FormGroup({
-    message: new FormControl('', [Validators.required, Validators.minLength(1)])
-  })
-
-  @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLDivElement>;
-
-  constructor(private dialog: MatDialog) {
-    this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
-  }
-  
-  ngOnInit() {
-    this.users$.pipe().subscribe(users => {
-        this.usersArray = users;
-    });
+    }
   }
 
   ngAfterViewChecked() {

@@ -6,6 +6,8 @@ import { UserProfile } from '../model/user';
 import { CommonModule } from '@angular/common';
 import { ChatroomService } from '../services/chatroom';
 import { getDatabase, onValue, ref } from '@angular/fire/database';
+import { getCurrentUser } from '../util/util';
+import { Collection } from '../util/constant';
 
 @Component({
   selector: 'app-user-list',
@@ -20,13 +22,8 @@ export class UserList {
   auth = inject(Auth);
   chatService = inject(ChatroomService);
   user$: Observable<User | null> = user(this.auth);
-  userProfile$: Observable<UserProfile | null> = this.user$.pipe(
-    switchMap(currentUser => currentUser
-      ? docData(doc(this.firestore, 'users', currentUser.uid)) as Observable<UserProfile>
-      : of(null)
-    )
-  );
-  userCollection = collection(this.firestore, 'users');
+  userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
+  userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<any[]>;
   onlineUids: string[] = [];
 

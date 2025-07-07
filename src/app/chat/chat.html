@@ -25,9 +25,11 @@
     </button>
   </div>
   <!--@if (openedRoomId) {-->
-    <div class="chat-detail">
+  <div class="user-list">
       <app-user-list></app-user-list>
-      <!--<app-chatroom [roomId]="openedRoomId"></app-chatroom>-->
-    </div>
+  </div>
+  <div class="chat-detail">
+    <app-chatroom [roomId]="openedRoomId"></app-chatroom>
+  </div>
   <!--}-->
 </div>

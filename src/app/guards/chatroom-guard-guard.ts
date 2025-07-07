@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, UrlTree } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { doc, Firestore, getDoc } from '@angular/fire/firestore';
+import { Collection } from '../util/constant';
 
 @Injectable({ providedIn: 'root' })
 export class ChatroomGuard implements CanActivate {
@@ -13,7 +14,7 @@ export class ChatroomGuard implements CanActivate {
     const roomId = route.params['id'];
     const user = this.auth.currentUser;
     if (!user) return this.router.parseUrl('/login');
-    const roomDoc = doc(this.firestore, 'chatrooms', roomId);
+    const roomDoc = doc(this.firestore, Collection.CHATROOMS, roomId);
     const roomSnap = await getDoc(roomDoc);
     if (!roomSnap.exists()) {
       return this.router.parseUrl('/');

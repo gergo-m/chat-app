@@ -4,6 +4,7 @@ import { addDoc, collection, collectionData, doc, docData, Firestore, orderBy, q
 import { Observable } from 'rxjs';
 import { Message } from '../model/message';
 import { UserProfile } from '../model/user';
+import { Collection } from '../util/constant';
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +35,7 @@ export class MessageService {
   }
 
   getSender(userId: string): Observable<UserProfile | undefined> {
-    const userRef = doc(this.firestore, 'users', userId);
+    const userRef = doc(this.firestore, Collection.USERS, userId);
     return docData(userRef) as Observable<UserProfile>;
   }
 }

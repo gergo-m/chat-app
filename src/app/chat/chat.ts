@@ -21,8 +21,10 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateChatroomDialog } from './create-chatroom-dialog/create-chatroom-dialog';
 import { UserList } from "../user-list/user-list";
 import { getDatabase, onValue, ref } from '@firebase/database';
-import { getTimestampMillis, formatTimestamp } from '../util/util';
+import { getTimestampMillis, formatTimestamp, getCurrentUser } from '../util/util';
 import { JoinChatroomDialog } from './join-chatroom-dialog/join-chatroom-dialog';
+import { Collection } from '../util/constant';
+import { Chatroom } from '../chatroom/chatroom';
 
 @Component({
   selector: 'app-chat',
@@ -38,7 +40,8 @@ import { JoinChatroomDialog } from './join-chatroom-dialog/join-chatroom-dialog'
     MatSelectModule,
     MatOptionModule,
     MatDialogModule,
-    UserList
+    UserList,
+    Chatroom
 ],
   templateUrl: './chat.html',
   styleUrl: './chat.scss'
@@ -49,26 +52,21 @@ export class Chat {
   router = inject(Router);
   chatroomService = inject(ChatroomService);
   user$: Observable<User | null> = user(this.auth);
-  userProfile$: Observable<UserProfile | null> = this.user$.pipe(
-    switchMap(currentUser => currentUser
-      ? docData(doc(this.firestore, 'users', currentUser.uid)) as Observable<UserProfile>
-      : of(null)
-    )
-  );
-  chatroomCollection = collection(this.firestore, 'chatrooms');
+  userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
+  chatroomCollection = collection(this.firestore, Collection.CHATROOMS);
   chatrooms$: Observable<Room[]>;
   userRooms$: Observable<Room[]> = this.user$.pipe(
     switchMap(currentUser => {
       if (!currentUser) return of([]);
 
       const visibleRoomsQuery = query(
-        collection(this.firestore, 'chatrooms'),
+        collection(this.firestore, Collection.CHATROOMS),
         where('visibility', 'in', ['public', 'password'])
       );
       const publicRooms$ = collectionData(visibleRoomsQuery, { idField: 'id' }) as Observable<Room[]>;
 
       const memberRoomsQuery = query(
-        collection(this.firestore, 'chatrooms'),
+        collection(this.firestore, Collection.CHATROOMS),
         where('visibility', '==', 'private'),
         where('members', 'array-contains', currentUser.uid)
       );
@@ -86,10 +84,10 @@ export class Chat {
       );
     })
   );
-  userCollection = collection(this.firestore, 'users');
+  userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<UserProfile[]>;
   usersArray: UserProfile[] = [];
-  openedRoomId: string | null = null;
+  openedRoomId: string = '';
   displayRooms$: Observable<any[]>;
   onlineUids: string[] = [];
   formatTimestamp = formatTimestamp;
@@ -184,7 +182,9 @@ export class Chat {
     const currentUserId = this.auth.currentUser?.uid;
     if (!currentUserId) return;
     if (room.members.includes(currentUserId)) {
-      this.router.navigate(['/chatroom', room.id]);
+      if (!room.id) return;
+      this.openedRoomId = room.id;
+      // this.router.navigate(['/chatroom', room.id]);
     } else {
       const dialogRef = this.dialog.open(JoinChatroomDialog, {
         width: '400px',
@@ -201,11 +201,11 @@ export class Chat {
           const newMembers = Array.from(new Set([...(room.members || []), currentUserId]));
           if (!room.id) return;
           this.chatroomService.updateRoom(room.id, room.name, newMembers);
-          this.router.navigate(['/chatroom', room.id]);
+          this.openedRoomId = room.id;
+          // this.router.navigate(['/chatroom', room.id]);
         }
       });
     }
-    // this.openedRoomId = roomId;
   }
 
   formatLastMessage(msg: string) {

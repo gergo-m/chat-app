@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { collection, collectionData, doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { UserProfile } from '../../model/user';
+import { Collection, ErrorMessage } from '../../util/constant';
 
 @Component({
   selector: 'app-register',
@@ -31,7 +32,7 @@ import { UserProfile } from '../../model/user';
 export class Register {
   firestore = inject(Firestore);
   auth = inject(Auth);
-  userCollection = collection(this.firestore, 'users');
+  userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<UserProfile[]>;
   
   registerForm = new FormGroup({
@@ -48,7 +49,7 @@ export class Register {
   async register() {
     try {
       if (this.registerForm.invalid) {
-        this.errorMessage = "Please correct the form errors.";
+        this.errorMessage = ErrorMessage.FORM_ERROR;
         return;
       }
       const name = this.registerForm.get('name')?.value ||'';
@@ -56,7 +57,7 @@ export class Register {
       const password = this.registerForm.get('password')?.value ||'';
       const userCredential = await this.authService.register(email, password);
       const uid = userCredential.user.uid;
-      await setDoc(doc(this.firestore, 'users', uid), {
+      await setDoc(doc(this.firestore, Collection.USERS, uid), {
         name, email, createdAt: new Date()
       });
       await updateProfile(userCredential.user, { displayName: name });
@@ -64,13 +65,13 @@ export class Register {
       if (error && typeof error === 'object' && 'code' in error) {
         switch (error.code) {
           case "auth/invalid-credential":
-            this.errorMessage = "Invalid email or password";
+            this.errorMessage = ErrorMessage.INVALID_CRED;
             break;
           default:
-            this.errorMessage = "Authentication failed. Please try again.";
+            this.errorMessage = ErrorMessage.AUTH_FAILED;
         }
       } else {
-        this.errorMessage = "An unexpected error occurred."
+        this.errorMessage = ErrorMessage.UNEXPECTED_ERR;
       }
     }
   }
@@ -84,7 +85,7 @@ export class Register {
     console.log(user);
     console.log(user.user);
     console.log(user.user.email);
-    await setDoc(doc(this.firestore, 'users', uid), {
+    await setDoc(doc(this.firestore, Collection.USERS, uid), {
       name, email, createdAt: new Date()
     });
     await updateProfile(user.user, { displayName: name });

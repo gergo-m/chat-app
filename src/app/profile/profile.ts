@@ -9,6 +9,8 @@ import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { updateDoc } from '@firebase/firestore';
 import { MatButton } from '@angular/material/button';
+import { getCurrentUser } from '../util/util';
+import { Collection } from '../util/constant';
 
 @Component({
   selector: 'app-profile',
@@ -29,12 +31,7 @@ export class Profile {
   firestore = inject(Firestore);
 
   user$: Observable<User | null> = user(this.auth);
-  userProfile$: Observable<UserProfile | null> = this.user$.pipe(
-    switchMap(currentUser => currentUser
-      ? docData(doc(this.firestore, 'users', currentUser.uid)) as Observable<UserProfile>
-      : of(null)
-    )
-  );
+  userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
 
   profileForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
@@ -54,6 +51,6 @@ export class Profile {
     if (email && email != currentUser.email) await updateEmail(currentUser, email);
     if (password) await updatePassword(currentUser, password);
 
-    await updateDoc(doc(this.firestore, 'users', currentUser.uid), { name, email });
+    await updateDoc(doc(this.firestore, Collection.USERS, currentUser.uid), { name, email });
   }
 }
