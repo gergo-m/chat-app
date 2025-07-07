@@ -16,7 +16,7 @@ import { Auth, user, User } from '@angular/fire/auth';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateChatroomDialog } from './update-chatroom-dialog/update-chatroom-dialog';
-import { getCurrentUser } from '../util/util';
+import { displayDateAbove, formatTimestamp, formatTimestampFull, getCurrentUser } from '../util/util';
 import { Collection } from '../util/constant';
 
 interface MessageWithSender extends Message {
@@ -50,6 +50,9 @@ export class Chatroom {
   chatroomService = inject(ChatroomService);
   auth = inject(Auth);
   router = inject(Router);
+  formatTimestamp = formatTimestamp;
+  formatTimestampFull = formatTimestampFull;
+  displayDateAbove = displayDateAbove;
   user$: Observable<User | null> = user(this.auth);
   userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
   // roomId = this.route.snapshot.params['id'];
@@ -152,6 +155,15 @@ export class Chatroom {
         this.chatroomService.updateRoom(this.roomId, result.name, result.participants);
       }
     })
+  }
+
+  getChatroomName(room: Room | null | undefined) {
+    if (!room) return '';
+    if (room.type === 'group') return room.name;
+    if (!this.auth.currentUser) return '';
+    const otherUid = room.members.find((uid: string) => uid !== this.auth.currentUser?.uid);
+    const otherUser = this.usersArray.find((u: any) => u.id === otherUid);
+    return otherUser?.name;
   }
 
   deleteChatroom() {

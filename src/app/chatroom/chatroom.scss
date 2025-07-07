@@ -9,7 +9,6 @@ html, body {
     height: 80vh;
     display: flex;
     flex-direction: column;
-    max-width: 500px;
     margin: 30px 50px;
     background-color: rgb(239, 247, 255);
     padding: 30px;
@@ -67,6 +66,12 @@ button {
     max-width: 400px;
 }
 
+.message-date {
+    width: fit-content;
+    margin: 0 auto;
+    color: rgb(167, 167, 167);
+    font-size: 13px;
+}
 .self {
     margin-left: auto;
 }
@@ -76,11 +81,9 @@ button {
 
 .send-message-container {
     margin: 20px 5px 0 5px;
-    max-width: 450px;
 }
 
 .message-input {
-    width: 370px;
     margin-right: 10px;
     border-radius: 15px;
 }

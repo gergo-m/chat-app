@@ -1,35 +1,46 @@
 <div class="chat-layout">
-  <div class="chat-list">
-    <h2>Hello, {{ (userProfile$ | async)?.name }}!</h2>
-    @for (room of displayRooms$ | async; track room.id) {
-      <div (click)="openOrJoinChatroom(room)" [class.selected]="room.id === openedRoomId" class="chatroom">
-        <h3>
-          @if (room.type === 'group') {
-            <mat-icon class="group-icon">group</mat-icon>
-          } @else if (room.type === 'private') {
-            <mat-icon class="private-icon" [ngClass]="onlineUids.includes(room.otherUid) ? 'online-icon' : ''">person</mat-icon>
-          }
-          {{ room.name }}
-        </h3>
-        <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : ''">
-        @if (isRestrictedAccess(room)) {
-          {{ "Restricted access" }}
-        } @else {
-          {{ formatLastMessage(room.lastMessage) }} ({{ formatTimestamp(room.lastMessageTimestamp) }})
-        }
-        </p>
-      </div>
-    }
-    <button mat-fab color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
-      <mat-icon>add</mat-icon>
+  <div class="sidebar">
+    <button mat-raised-button color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
+      New chatroom <mat-icon>add</mat-icon>
     </button>
+    <div class="sidebar-tabs">
+      <button [class.active]="activeTab === 'chatrooms'" (click)="activeTab = 'chatrooms'">Chatrooms</button>
+      <button [class.active]="activeTab === 'onlineUsers'" (click)="activeTab = 'onlineUsers'">Online Users</button>
+    </div>
+    <div class="sidebar-content">
+      @if (activeTab === 'chatrooms') {
+        @for (room of displayRooms$ | async; track room.id) {
+          <div (click)="openOrJoinChatroom(room)" [class.selected]="room.id === openedRoomId" class="chatroom">
+            <h3>
+              @if (room.type === 'group') {
+                <mat-icon class="group-icon">group</mat-icon>
+              } @else if (room.type === 'private') {
+                <mat-icon class="private-icon" [ngClass]="(onlineUids$ | async)?.includes(room.otherUid) ? 'online-icon' : ''">person</mat-icon>
+              }
+              {{ room.name }}
+            </h3>
+            <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : ''">
+            @if (isRestrictedAccess(room)) {
+              {{ "Restricted access" }}
+            } @else {
+              {{ formatLastMessage(room.lastMessage) }} ({{ formatTimestamp(room.lastMessageTimestamp) }})
+            }
+            </p>
+          </div>
+        }
+      } @else if (activeTab === 'onlineUsers') {
+        @for (user of onlineUsers$ | async; track user.id) {
+          <div class="online-user chatroom" (click)="openPrivateChat(user.id)">
+            <h3 class="online-name"><mat-icon class="online-icon">person</mat-icon> {{ user.name }}</h3>
+          </div>
+        }
+      }
+    </div>
   </div>
-  <!--@if (openedRoomId) {-->
-  <div class="user-list">
+  <!--<div class="user-list">
       <app-user-list></app-user-list>
-  </div>
+  </div>-->
   <div class="chat-detail">
     <app-chatroom [roomId]="openedRoomId"></app-chatroom>
   </div>
-  <!--}-->
 </div>

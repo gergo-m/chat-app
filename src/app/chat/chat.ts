@@ -4,7 +4,7 @@ import { Auth, user } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
 import { Firestore, collection, collectionData, docData } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
+import { BehaviorSubject, combineLatest, from, map, Observable, of, switchMap } from 'rxjs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +25,11 @@ import { getTimestampMillis, formatTimestamp, getCurrentUser } from '../util/uti
 import { JoinChatroomDialog } from './join-chatroom-dialog/join-chatroom-dialog';
 import { Collection } from '../util/constant';
 import { Chatroom } from '../chatroom/chatroom';
+
+interface ChatInfo {
+  hasPrivateRoom: boolean;
+  privateRoom?: Room | null;
+}
 
 @Component({
   selector: 'app-chat',
@@ -50,6 +55,7 @@ export class Chat {
   firestore = inject(Firestore);
   auth = inject(Auth);
   router = inject(Router);
+  chatService = inject(ChatroomService);
   chatroomService = inject(ChatroomService);
   user$: Observable<User | null> = user(this.auth);
   userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
@@ -89,7 +95,10 @@ export class Chat {
   usersArray: UserProfile[] = [];
   openedRoomId: string = '';
   displayRooms$: Observable<any[]>;
-  onlineUids: string[] = [];
+  onlineUids$ = new BehaviorSubject<string[]>([]);
+  onlineUsers$: Observable<UserProfile[]>;
+  // onlineUsersWithChatInfo$: Observable<UserProfile & ChatInfo>;
+  activeTab: 'chatrooms' | 'onlineUsers' = 'chatrooms';
   formatTimestamp = formatTimestamp;
   
   addRoomForm: FormGroup = new FormGroup({
@@ -111,9 +120,10 @@ export class Chat {
     });
     const statusRef = ref(getDatabase(), '/status');
     onValue(statusRef, (snapshot) => {
-      this.onlineUids = Object.keys(snapshot.val() || {}).filter(
+      const onlineUids = Object.keys(snapshot.val() || {}).filter(
         uid => snapshot.val()[uid].state === 'online'
       );
+      this.onlineUids$.next(onlineUids);
     });
     this.displayRooms$ = combineLatest([
       this.userRooms$,
@@ -139,7 +149,30 @@ export class Chat {
           }
         })
       })
-    )
+    );
+    this.onlineUsers$ = combineLatest([
+      this.users$,
+      this.onlineUids$
+    ]).pipe(
+      map(([users, onlineUids]) => users.filter(user => onlineUids.includes(user.id) && user.id !== this.auth.currentUser?.uid))
+    );
+    /* this.onlineUsersWithChatInfo$ = combineLatest([
+      this.user$,
+      this.onlineUsers$
+    ]).pipe(
+      switchMap(([currentUser, onlineUsers]) => {
+        if (!currentUser) return of([]);
+        const promises = onlineUsers.map(async user => {
+          const privateRoom = await this.getPrivateRoom(user.id);
+          return {
+            ...user,
+            hasPrivateRoom: !!privateRoom,
+            privateRoom
+          };
+        });
+        return from(Promise.all(promises));
+      })
+    ); */
   }
 
   ngOnInit() {
@@ -150,7 +183,6 @@ export class Chat {
 
   async openCreateChatroomDialog() {
     const currentUserId = this.auth.currentUser?.uid;
-
     const dialogRef = this.dialog.open(CreateChatroomDialog, {
       width: '400px',
       data: {
@@ -176,6 +208,16 @@ export class Chat {
     if (!validVisibilities.includes(visibility as any)) return;
     this.chatroomService.createChatroom(name, 'group', visibility as 'public' | 'private' | 'password', password, participants);
     this.addRoomForm.reset({ type: 'private' });
+  }
+
+  hasPrivateRoom(user2: string) {
+    if (!this.auth.currentUser) return;
+    return this.chatroomService.hasPrivateRoom(this.auth.currentUser.uid, user2);
+  }
+
+  getPrivateRoom(user2: string) {
+    if (!this.auth.currentUser) return;
+    return this.hasPrivateRoom(user2) ? this.chatroomService.getOrCreatePrivateRoom(this.auth.currentUser.uid, user2) : null;
   }
 
   openOrJoinChatroom(room: Room) {
@@ -223,5 +265,10 @@ export class Chat {
 
   isRestrictedAccess(room: { visibility: string, members: string[] }) {
     return (room.visibility === 'password' && !this.isUserMember(room)) || (room.visibility === 'public' && !this.isUserMember(room));
+  }
+
+  async openPrivateChat(user2: string) {
+    if (!this.auth.currentUser) return;
+    this.openedRoomId = await this.chatService.getOrCreatePrivateRoom(this.auth.currentUser.uid, user2);
   }
 }

@@ -2,12 +2,34 @@
     display: flex;
     height: 100vh;
 }
-.chat-list {
+.sidebar {
     width: 300px;
     border-right: 1px solid #e0e0e0;
-    overflow-y: auto;
     background: #f7fafd;
-    padding: 20px 0;
+}
+.add-room-btn {
+    margin: auto auto;
+}
+.sidebar-tabs {
+    display: flex;
+    margin-top: 5px;
+    button {
+        flex: 1;
+        border: none;
+        background-color: #f7fafd;
+        padding: 10px;
+        cursor: pointer;
+        &.active {
+            background: #fff;
+            font-weight: bold;
+            border-bottom: 2px solid #1976d2;
+        }
+    }
+}
+.sidebar-content {
+    overflow-y: auto;
+    min-height: 0;
+    max-height: 85vh;
 }
 .chat-detail {
     flex: 1 1 auto;
@@ -15,6 +37,11 @@
     background: #fff;
     display: flex;
     flex-direction: column;
+    height: fit-content;
+}
+
+.user-list {
+    max-height: 90vh;
 }
 
 .create-chatroom-container {
@@ -51,6 +78,9 @@ h3 {
     flex-direction: row;
     gap: 5px;
     margin-bottom: 0;
+}
+.online-name {
+    margin-bottom: 15px;
 }
 .last-message {
     margin-top: 5px;

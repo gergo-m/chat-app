@@ -78,6 +78,14 @@ export class ChatroomService {
     return roomId;
   }
 
+  async hasPrivateRoom(user1: string | undefined, user2: string) {
+    const sortedIds = [user1, user2].sort();
+    const roomId = `private_${sortedIds[0]}_${sortedIds[1]}`;
+    const roomRef = doc(this.firestore, `chatrooms/${roomId}`);
+    const roomSnap = await getDoc(roomRef);
+    return roomSnap.exists();
+  }
+
   async isUserMember(roomId: string, userId: string): Promise<boolean> {
     const roomDocRef = doc(this.firestore, Collection.CHATROOMS, roomId);
     const roomSnap = await getDoc(roomDocRef);
