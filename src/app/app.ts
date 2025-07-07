@@ -4,7 +4,6 @@ import { RouterOutlet, Router, RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { Auth } from '@angular/fire/auth';
-import { onAuthStateChanged } from 'firebase/auth';
 import { Firestore } from '@angular/fire/firestore';
 import { MatButton } from '@angular/material/button';
 import { PresenceService } from './services/presence';

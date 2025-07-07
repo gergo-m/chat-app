@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
-import { FormsModule, FormBuilder, Validators, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import { FormsModule, Validators, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormField, MatInputModule, MatLabel } from '@angular/material/input';
+import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -44,13 +44,17 @@ export class Login {
       const email = this.loginForm.get('email')?.value ||'';
       const password = this.loginForm.get('password')?.value ||'';
       await this.authService.login(email, password);
-    } catch (error: any) {
-      switch (error.code) {
-        case "auth/invalid-credential":
-          this.errorMessage = "Invalid email or password";
-          break;
-        default:
-          this.errorMessage = "Authentication failed. Please try again.";
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error) {
+        switch (error.code) {
+          case "auth/invalid-credential":
+            this.errorMessage = "Invalid email or password";
+            break;
+          default:
+            this.errorMessage = "Authentication failed. Please try again.";
+        }
+      } else {
+        this.errorMessage = "An unexpected error occurred."
       }
     }
   }

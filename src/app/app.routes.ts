@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { Register } from './auth/register/register';
 import { GuestGuard } from './guards/guest-guard';
 import { UserGuard } from './guards/user-guard';
 import { ChatroomGuard } from './guards/chatroom-guard-guard';

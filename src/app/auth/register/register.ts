@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { FormControl, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { Auth, GoogleAuthProvider } from '@angular/fire/auth';
 import { signInWithPopup, updateProfile } from '@firebase/auth';
@@ -9,8 +9,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { addDoc, collection, collectionData, doc, Firestore, setDoc } from '@angular/fire/firestore';
+import { collection, collectionData, doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { UserProfile } from '../../model/user';
 
 @Component({
   selector: 'app-register',
@@ -31,7 +32,7 @@ export class Register {
   firestore = inject(Firestore);
   auth = inject(Auth);
   userCollection = collection(this.firestore, 'users');
-  users$: Observable<any[]>;
+  users$: Observable<UserProfile[]>;
   
   registerForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -41,7 +42,7 @@ export class Register {
   errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) {
-    this.users$ = collectionData(this.userCollection, { idField: 'id' });
+    this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
   }
 
   async register() {
@@ -59,8 +60,18 @@ export class Register {
         name, email, createdAt: new Date()
       });
       await updateProfile(userCredential.user, { displayName: name });
-    } catch (error: any) {
-      this.errorMessage = error.message;
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error) {
+        switch (error.code) {
+          case "auth/invalid-credential":
+            this.errorMessage = "Invalid email or password";
+            break;
+          default:
+            this.errorMessage = "Authentication failed. Please try again.";
+        }
+      } else {
+        this.errorMessage = "An unexpected error occurred."
+      }
     }
   }
 

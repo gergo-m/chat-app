@@ -31,7 +31,7 @@ export class UpdateChatroomDialog {
 
   constructor(
     public dialogRef: MatDialogRef<UpdateChatroomDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: { users: any[], currentUserId: string, currentName: string, currentParticipants: any[] }
+    @Inject(MAT_DIALOG_DATA) public data: { users: any[], currentUserId: string, currentName: string, currentParticipants: string[] }
   ) {
     this.updateRoomForm = new FormGroup({
         name: new FormControl(data.currentName, [Validators.required, Validators.minLength(1)]),

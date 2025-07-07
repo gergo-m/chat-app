@@ -1,7 +1,7 @@
-import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
 import { Message } from '../model/message';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from '../services/message';
 import { ChatroomService } from '../services/chatroom';
 import { collection, collectionData, doc, docData, Firestore } from '@angular/fire/firestore';
@@ -66,8 +66,8 @@ export class Chatroom {
   );
   // chatroom$: Observable<Room | undefined> =  this.chatroomService.getChatroom(this.roomId);
   userCollection = collection(this.firestore, 'users');
-  users$: Observable<any[]>;
-  usersArray: any[] = [];
+  users$: Observable<UserProfile[]>;
+  usersArray: UserProfile[] = [];
 
   messagesWithSenders$: Observable<MessageWithPrevSender[]> = this.messageService.getRoomMessages(this.roomId).pipe(
     switchMap(messages => {
@@ -103,7 +103,7 @@ export class Chatroom {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLDivElement>;
 
   constructor(private dialog: MatDialog) {
-    this.users$ = collectionData(this.userCollection, { idField: 'id' });
+    this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
   }
   
   ngOnInit() {
@@ -131,7 +131,7 @@ export class Chatroom {
     }
   }
 
-  async openUpdateChatroomDialog(currentName: string, currentParticipants: any[]) {
+  async openUpdateChatroomDialog(currentName: string, currentParticipants: string[]) {
     const currentUserId = this.auth.currentUser?.uid;
 
     const dialogRef = this.dialog.open(UpdateChatroomDialog, {

@@ -1,4 +1,4 @@
-import { inject, Inject, Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import {
     Auth,
     browserSessionPersistence,
@@ -10,10 +10,8 @@ import {
     user,
     User
 } from '@angular/fire/auth';
-import { getDatabase, onDisconnect, onValue, ref, set } from "@firebase/database";
 import { setPersistence } from "firebase/auth";
-import firebase from "firebase/compat/app";
-import { from, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -40,14 +38,8 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    try {
-      const userCredential = await signInWithEmailAndPassword(this.firebaseAuth, email, password);
-      return userCredential;
-    } catch (error) {
-      throw error;
-    }
-
-    
+    const userCredential = await signInWithEmailAndPassword(this.firebaseAuth, email, password);
+    return userCredential;
   }
 
   // Logout current user

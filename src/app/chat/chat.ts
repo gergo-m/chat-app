@@ -2,14 +2,14 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
-import { Firestore, collection, collectionData, addDoc, docData } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, docData } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { doc, getDoc, orderBy, query, where } from '@firebase/firestore';
+import { doc, query, where } from '@firebase/firestore';
 import { UserProfile } from '../model/user';
 import { Room } from '../model/chatroom';
 import { ChatroomService } from '../services/chatroom';
@@ -19,7 +19,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateChatroomDialog } from './create-chatroom-dialog/create-chatroom-dialog';
-import { Chatroom } from "../chatroom/chatroom";
 import { UserList } from "../user-list/user-list";
 import { getDatabase, onValue, ref } from '@firebase/database';
 import { getTimestampMillis, formatTimestamp } from '../util/util';
@@ -49,8 +48,6 @@ export class Chat {
   auth = inject(Auth);
   router = inject(Router);
   chatroomService = inject(ChatroomService);
-  testCollection = collection(this.firestore, 'test');
-  testMessages$: Observable<any[]>;
   user$: Observable<User | null> = user(this.auth);
   userProfile$: Observable<UserProfile | null> = this.user$.pipe(
     switchMap(currentUser => currentUser
@@ -59,8 +56,8 @@ export class Chat {
     )
   );
   chatroomCollection = collection(this.firestore, 'chatrooms');
-  chatrooms$: Observable<any[]>;
-  userRooms$: Observable<any[]> = this.user$.pipe(
+  chatrooms$: Observable<Room[]>;
+  userRooms$: Observable<Room[]> = this.user$.pipe(
     switchMap(currentUser => {
       if (!currentUser) return of([]);
 
@@ -90,8 +87,8 @@ export class Chat {
     })
   );
   userCollection = collection(this.firestore, 'users');
-  users$: Observable<any[]>;
-  usersArray: any[] = [];
+  users$: Observable<UserProfile[]>;
+  usersArray: UserProfile[] = [];
   openedRoomId: string | null = null;
   displayRooms$: Observable<any[]>;
   onlineUids: string[] = [];
@@ -104,9 +101,8 @@ export class Chat {
   });
 
   constructor(private dialog: MatDialog) {
-    this.testMessages$ = collectionData(this.testCollection, { idField: 'id' });
-    this.chatrooms$ = collectionData(this.chatroomCollection, { idField: 'id' });
-    this.users$ = collectionData(this.userCollection, { idField: 'id' });
+    this.chatrooms$ = collectionData(this.chatroomCollection, { idField: 'id' }) as Observable<Room[]>;
+    this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
     this.user$.subscribe(currentUser => {
       const initialParticipants = currentUser ? [currentUser.uid] : [];
       this.addRoomForm = new FormGroup({
@@ -154,11 +150,6 @@ export class Chat {
     });
   }
 
-  async addMessage(text: string) {
-    if (!text.trim()) return;
-    await addDoc(this.testCollection, { message: text });
-  }
-
   async openCreateChatroomDialog() {
     const currentUserId = this.auth.currentUser?.uid;
 
@@ -189,7 +180,7 @@ export class Chat {
     this.addRoomForm.reset({ type: 'private' });
   }
 
-  openOrJoinChatroom(room: {id: string, name: string, visibility: string, members: string[], password: string}) {
+  openOrJoinChatroom(room: Room) {
     const currentUserId = this.auth.currentUser?.uid;
     if (!currentUserId) return;
     if (room.members.includes(currentUserId)) {
@@ -208,6 +199,7 @@ export class Chat {
         if (result) {
           if (room.password !== result.password) return;
           const newMembers = Array.from(new Set([...(room.members || []), currentUserId]));
+          if (!room.id) return;
           this.chatroomService.updateRoom(room.id, room.name, newMembers);
           this.router.navigate(['/chatroom', room.id]);
         }
