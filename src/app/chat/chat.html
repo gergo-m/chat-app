@@ -6,8 +6,8 @@
     </div>
     <div class="sidebar-content">
       @if (activeTab === 'chatrooms') {
-        <button mat-raised-button color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
-          New chatroom <mat-icon>add</mat-icon>
+        <button mat-fab color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
+          <mat-icon>add</mat-icon>
         </button>
         @for (room of displayRooms$ | async; track room.id) {
           <div (click)="openOrJoinChatroom(room)" [class.selected]="room.id === openedRoomId" class="chatroom">
