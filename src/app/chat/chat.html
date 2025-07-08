@@ -20,15 +20,20 @@
               }
               {{ room.name }}
             </h3>
-            <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : (!room.lastMessage ? 'no-messages' : (room.lastMessageSeenBy && !room.lastMessageSeenBy.includes(currentUserId)) ? 'unread-message' : '')" >
-            @if (isRestrictedAccess(room)) {
-              {{ "Restricted access" }}
-            } @else if (room.lastMessage) {
-              {{ formatLastMessage(room.lastMessage) }} ({{ formatTimestamp(room.lastMessageTimestamp) }})
-            } @else {
-              {{ "No messages yet..." }}
-            }
-            </p>
+            <div class="last-message-container">
+              <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : (!room.lastMessage ? 'no-messages' : (room.lastMessageSeenBy && !room.lastMessageSeenBy.includes(currentUserId)) ? 'unread-message' : '')" >
+              @if (isRestrictedAccess(room)) {
+                {{ "Restricted access" }}
+              } @else if (room.lastMessage) {
+                {{ room.lastMessage }}
+              } @else {
+                {{ "No messages yet..." }}
+              }
+              </p>
+              @if (!isRestrictedAccess(room) && room.lastMessage) {
+                <p class="last-message-timestamp">{{ formatTimestamp(room.lastMessageTimestamp) }}</p>
+              }
+            </div>
           </div>
         }
         

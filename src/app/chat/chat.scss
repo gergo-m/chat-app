@@ -1,3 +1,9 @@
+button {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    background-color: white;
+    color: darkslateblue;
+}
 .chat-layout {
     display: flex;
     flex: 1 1 auto;
@@ -41,6 +47,7 @@
         border: none;
         background-color: #f7fafd;
         padding: 10px;
+        border-radius: 5px 5px 0 0;
         cursor: pointer;
         &.active {
             background: #fff;
@@ -104,10 +111,24 @@ h3 {
 .online-name {
     margin-bottom: 15px;
 }
-.last-message {
+.last-message-container {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
+.last-message, .last-message-timestamp {
     margin-top: 5px;
     color: darkslategray;
     align-items: center;
+}
+.last-message {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.last-message-timestamp {
+    color: rgb(73, 122, 122);
 }
 .special-access, .no-messages {
     font-style: italic;
