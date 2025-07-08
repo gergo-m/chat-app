@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButton } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { UserProfile } from '../model/user';
 import { Auth, user, User } from '@angular/fire/auth';
 import { MatIconModule } from '@angular/material/icon';
@@ -37,7 +37,7 @@ interface MessageWithPrevSender extends MessageWithSender {
     MatLabel,
     MatInputModule,
     ReactiveFormsModule,
-    MatButton,
+    MatButtonModule,
     MatIconModule
   ],
   templateUrl: './chatroom.html',

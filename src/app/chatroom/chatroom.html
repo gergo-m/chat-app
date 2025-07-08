@@ -9,9 +9,11 @@
             </div>
             <div class="actions">
                 @if ((chatroom$ | async)?.type === 'group') {
-                    <button mat-raised-button *ngIf="chatroom$ | async as currentRoom" (click)="leaveChatroom(currentRoom)"><mat-icon>exit_to_app</mat-icon></button>
-                    <button mat-raised-button *ngIf="chatroom$ | async as currentRoom" (click)="openUpdateChatroomDialog(currentRoom.name, currentRoom.members)"><mat-icon>edit</mat-icon></button>
-                    <button mat-raised-button (click)="deleteChatroom()"><mat-icon>delete</mat-icon></button>
+                    <button matMiniFab *ngIf="chatroom$ | async as currentRoom" (click)="leaveChatroom(currentRoom)" class="action-btn"><mat-icon>exit_to_app</mat-icon></button>
+                    @if ((chatroom$ | async)?.ownerId === undefined || (chatroom$ | async)?.ownerId === this.auth.currentUser?.uid) {
+                        <button matMiniFab *ngIf="chatroom$ | async as currentRoom" (click)="openUpdateChatroomDialog(currentRoom.name, currentRoom.members)" class="action-btn"><mat-icon>edit</mat-icon></button>
+                        <button matMiniFab (click)="deleteChatroom()" class="action-btn"><mat-icon>delete</mat-icon></button>
+                    }
                 }
             </div>
         </div>
@@ -38,7 +40,7 @@
                     <mat-label>Send a message...</mat-label>
                     <input matInput formControlName="message" type="text">
                 </mat-form-field>
-                <button mat-flat-button type="submit" class="send-btn"><mat-icon>send</mat-icon></button>
+                <button matMiniFab color="primary" type="submit" class="send-btn"><mat-icon>send</mat-icon></button>
             </form>
         </div>
     } @else {

@@ -3,12 +3,14 @@ import { collection, collectionData, deleteDoc, doc, docData, Firestore, getDoc,
 import { combineLatest, map, Observable } from 'rxjs';
 import { Room } from '../model/chatroom';
 import { Collection } from '../util/constant';
+import { Auth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatroomService {
   firestore = inject(Firestore);
+  auth = inject(Auth);
 
   constructor() { }
 
@@ -17,6 +19,7 @@ export class ChatroomService {
     console.log(visibility, password);
     await setDoc(chatroomRef, {
       name, type, members,
+      ownerId: this.auth.currentUser?.uid,
       createdAt: new Date(),
       lastMessage: '',
       lastMessageTimestamp: new Date(),
