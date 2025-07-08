@@ -45,7 +45,6 @@ interface ChatInfo {
     MatSelectModule,
     MatOptionModule,
     MatDialogModule,
-    UserList,
     Chatroom
 ],
   templateUrl: './chat.html',
@@ -100,6 +99,7 @@ export class Chat {
   // onlineUsersWithChatInfo$: Observable<UserProfile & ChatInfo>;
   activeTab: 'chatrooms' | 'onlineUsers' = 'chatrooms';
   formatTimestamp = formatTimestamp;
+  onlineUserCount = 0;
   
   addRoomForm: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -154,7 +154,10 @@ export class Chat {
       this.users$,
       this.onlineUids$
     ]).pipe(
-      map(([users, onlineUids]) => users.filter(user => onlineUids.includes(user.id) && user.id !== this.auth.currentUser?.uid))
+      map(([users, onlineUids]) => {
+        this.onlineUserCount++;
+        return users.filter(user => onlineUids.includes(user.id) && user.id !== this.auth.currentUser?.uid);
+      })
     );
     /* this.onlineUsersWithChatInfo$ = combineLatest([
       this.user$,

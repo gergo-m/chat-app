@@ -19,20 +19,26 @@
               }
               {{ room.name }}
             </h3>
-            <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : ''">
+            <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : (!room.lastMessage ? 'no-messages' : '')" >
             @if (isRestrictedAccess(room)) {
               {{ "Restricted access" }}
-            } @else {
+            } @else if (room.lastMessage) {
               {{ formatLastMessage(room.lastMessage) }} ({{ formatTimestamp(room.lastMessageTimestamp) }})
+            } @else {
+              {{ "No messages yet..." }}
             }
             </p>
           </div>
         }
       } @else if (activeTab === 'onlineUsers') {
-        @for (user of onlineUsers$ | async; track user.id) {
-          <div class="online-user chatroom" (click)="openPrivateChat(user.id)">
-            <h3 class="online-name"><mat-icon class="online-icon">person</mat-icon> {{ user.name }}</h3>
-          </div>
+        @if (onlineUserCount > 0) {
+          @for (user of onlineUsers$ | async; track user.id) {
+            <div class="online-user chatroom" (click)="openPrivateChat(user.id)">
+              <h3 class="online-name"><mat-icon class="online-icon">person</mat-icon> {{ user.name }}</h3>
+            </div>
+          }
+        } @else {
+          <p class="no-online-users">No online users...</p>
         }
       }
     </div>

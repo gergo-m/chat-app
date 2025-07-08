@@ -1,41 +1,45 @@
 <div class="chatroom-container">
-    <div class="chatroom-header">
-        <div class="details">
-            <h2 class="chat-title">{{ getChatroomName(chatroom$ | async) || 'Loading...' }}</h2>
-            <p class="members-count">Members: {{ (chatroom$ | async)?.members?.length || 0 }}</p>
-        </div>
-        <div class="actions">
-            @if ((chatroom$ | async)?.type === 'group') {
-                <button mat-raised-button *ngIf="chatroom$ | async as currentRoom" (click)="leaveChatroom(currentRoom)"><mat-icon>exit_to_app</mat-icon></button>
-                <button mat-raised-button *ngIf="chatroom$ | async as currentRoom" (click)="openUpdateChatroomDialog(currentRoom.name, currentRoom.members)"><mat-icon>edit</mat-icon></button>
-                <button mat-raised-button (click)="deleteChatroom()"><mat-icon>delete</mat-icon></button>
-            }
-        </div>
-    </div>
-
-    <div class="messages-container" #messagesContainer>
-        @for (message of messagesWithSenders$ | async; track message.id; let i = $index) {
-            <div class="message-container">
-                @if (!message.prev || (message.prev && displayDateAbove(message.timestamp, message.prev.timestamp))) {
-                    <div class="message-date"> {{ formatTimestampFull(message.timestamp) }} </div>
-                }
-                @if (message.prev?.senderId !== message.senderId) {
-                    <div class="sender-name" [ngClass]="message.senderName == (userProfile$ | async)?.name ? 'self' : ''"> {{ message.senderName }} </div>
-                }
-                <div class="message" [ngClass]="message.senderName == (userProfile$ | async)?.name ? 'self' : ''" [title]="formatTimestampFull(message.timestamp)">
-                    {{ message.text }}
-                </div>
+    @if (roomId) {
+        <div class="chatroom-header">
+            <div class="details">
+                <h2 class="chat-title">{{ getChatroomName(chatroom$ | async) || 'Loading...' }}</h2>
+                <p class="members-count">Members: {{ (chatroom$ | async)?.members?.length || 0 }}</p>
             </div>
-        } @empty {<p>No messages yet</p>}
-    </div>
+            <div class="actions">
+                @if ((chatroom$ | async)?.type === 'group') {
+                    <button mat-raised-button *ngIf="chatroom$ | async as currentRoom" (click)="leaveChatroom(currentRoom)"><mat-icon>exit_to_app</mat-icon></button>
+                    <button mat-raised-button *ngIf="chatroom$ | async as currentRoom" (click)="openUpdateChatroomDialog(currentRoom.name, currentRoom.members)"><mat-icon>edit</mat-icon></button>
+                    <button mat-raised-button (click)="deleteChatroom()"><mat-icon>delete</mat-icon></button>
+                }
+            </div>
+        </div>
 
-    <div class="send-message-container">
-        <form [formGroup]="sendForm" (ngSubmit)="sendMessage()">
-            <mat-form-field class="message-input">
-                <mat-label>Send a message...</mat-label>
-                <input matInput formControlName="message" type="text">
-            </mat-form-field>
-            <button mat-flat-button type="submit" class="send-btn"><mat-icon>send</mat-icon></button>
-        </form>
-    </div>
+        <div class="messages-container" #messagesContainer>
+            @for (message of messagesWithSenders$ | async; track message.id; let i = $index) {
+                <div class="message-container">
+                    @if (!message.prev || (message.prev && displayDateAbove(message.timestamp, message.prev.timestamp))) {
+                        <div class="message-date"> {{ formatTimestampFull(message.timestamp) }} </div>
+                    }
+                    @if (message.prev?.senderId !== message.senderId) {
+                        <div class="sender-name" [ngClass]="message.senderName == (userProfile$ | async)?.name ? 'self' : ''"> {{ message.senderName }} </div>
+                    }
+                    <div class="message" [ngClass]="message.senderName == (userProfile$ | async)?.name ? 'self' : ''" [title]="formatTimestampFull(message.timestamp)">
+                        {{ message.text }}
+                    </div>
+                </div>
+            } @empty {<p>No messages yet</p>}
+        </div>
+
+        <div class="send-message-container">
+            <form [formGroup]="sendForm" (ngSubmit)="sendMessage()">
+                <mat-form-field class="message-input">
+                    <mat-label>Send a message...</mat-label>
+                    <input matInput formControlName="message" type="text">
+                </mat-form-field>
+                <button mat-flat-button type="submit" class="send-btn"><mat-icon>send</mat-icon></button>
+            </form>
+        </div>
+    } @else {
+        <p class="get-started">Click on a chat to get started!</p>
+    }
 </div>

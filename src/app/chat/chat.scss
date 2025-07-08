@@ -29,7 +29,7 @@
 .sidebar-content {
     overflow-y: auto;
     min-height: 0;
-    max-height: 85vh;
+    max-height: 77vh;
 }
 .chat-detail {
     flex: 1 1 auto;
@@ -38,10 +38,6 @@
     display: flex;
     flex-direction: column;
     height: fit-content;
-}
-
-.user-list {
-    max-height: 90vh;
 }
 
 .create-chatroom-container {
@@ -68,9 +64,11 @@
     padding: 1px 20px;
     border-radius: 12px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    transition: background-color 200ms linear;
 }
 .chatroom:hover {
     cursor: pointer;
+    background-color: rgb(229, 241, 253);
 }
 
 h3 {
@@ -86,7 +84,7 @@ h3 {
     margin-top: 5px;
     color: darkslategray;
 }
-.special-access {
+.special-access, .no-messages {
     font-style: italic;
 }
 .group-icon {
@@ -94,4 +92,9 @@ h3 {
 }
 .online-icon {
     color: green;
+}
+
+.no-online-users {
+    font-style: italic;
+    color: rgb(129, 162, 173);
 }
