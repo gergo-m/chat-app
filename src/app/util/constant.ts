@@ -10,3 +10,9 @@ export enum Collection {
     USERS = 'users',
     CHATROOMS = 'chatrooms'
 }
+
+export enum ProviderType {
+    GOOGLE = 'google',
+    GITHUB = 'github',
+    INVALID = 'invalid'
+}

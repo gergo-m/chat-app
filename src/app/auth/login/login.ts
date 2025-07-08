@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Auth, GoogleAuthProvider } from '@angular/fire/auth';
-import { signInWithPopup } from '@firebase/auth';
+import { GithubAuthProvider, signInWithPopup } from '@firebase/auth';
 import { ErrorMessage } from '../../util/constant';
 
 @Component({
@@ -62,6 +62,11 @@ export class Login {
 
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
+    await signInWithPopup(this.auth, provider);
+  }
+
+  async loginWithGithub() {
+    const provider = new GithubAuthProvider();
     await signInWithPopup(this.auth, provider);
   }
 }

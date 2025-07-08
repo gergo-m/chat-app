@@ -130,10 +130,12 @@ export class Chatroom {
   }
 
   private scrollToBottom(): void {
-    try {
-      this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
-    } catch(error) {
-      console.log("Error while scrolling:", error);
+    if (this.messagesContainer) {
+      try {
+        this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+      } catch(error) {
+        console.log("Error while scrolling:", error);
+      }
     }
   }
 

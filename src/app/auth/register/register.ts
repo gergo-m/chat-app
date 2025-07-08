@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { Auth, GoogleAuthProvider } from '@angular/fire/auth';
-import { signInWithPopup, updateProfile } from '@firebase/auth';
+import { GithubAuthProvider, signInWithPopup, updateProfile } from '@firebase/auth';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { collection, collectionData, doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { UserProfile } from '../../model/user';
-import { Collection, ErrorMessage } from '../../util/constant';
+import { Collection, ErrorMessage, ProviderType } from '../../util/constant';
 
 @Component({
   selector: 'app-register',
@@ -32,6 +32,7 @@ import { Collection, ErrorMessage } from '../../util/constant';
 export class Register {
   firestore = inject(Firestore);
   auth = inject(Auth);
+  provider = ProviderType;
   userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<UserProfile[]>;
   
@@ -76,15 +77,30 @@ export class Register {
     }
   }
 
-  async loginWithGoogle() {
-    const provider = new GoogleAuthProvider();
+  async loginWithProvider(providerType: ProviderType) {
+    let provider;
+    switch (providerType) {
+      case ProviderType.GOOGLE:
+        provider = new GoogleAuthProvider();
+        break;
+      case ProviderType.GITHUB:
+        provider = new GithubAuthProvider();
+        break;
+      default:
+        provider = ProviderType.INVALID;
+        break;
+    }
+    if (typeof provider === 'string') return;
     const user = await signInWithPopup(this.auth, provider);
     const uid = user.user.uid;
-    const name = user.user.displayName;
     const email = user.user.email;
+    const name = !user.user.displayName || user.user.displayName === email ? email?.substring(0, email.indexOf('@')) : user.user.displayName;
     console.log(user);
     console.log(user.user);
-    console.log(user.user.email);
+    console.log(uid);
+    console.log(email);
+    console.log(name);
+    console.log(user.user.displayName);
     await setDoc(doc(this.firestore, Collection.USERS, uid), {
       name, email, createdAt: new Date()
     });
