@@ -36,7 +36,7 @@ export function formatTimestampFull(timestamp: { seconds: number; nanoseconds: n
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const now = new Date();
   if (date.getFullYear() !== now.getFullYear()) return `${year} ${monthName} ${day} at ${hours}:${minutes}`;
-  if ((date.getDay() > now.getDay()) && Math.abs(now.getDate() - date.getDate()) < 7) return `${dayName} at ${hours}:${minutes}`;
+  if ((date.getDay() != now.getDay()) && Math.abs(now.getDate() - date.getDate()) < 7) return `${dayName} at ${hours}:${minutes}`;
   if (date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) return `${hours}:${minutes}`;
   return `${monthName} ${day} at ${hours}:${minutes}`;
 }

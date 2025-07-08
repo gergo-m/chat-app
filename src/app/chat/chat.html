@@ -31,15 +31,15 @@
           </div>
         }
       } @else if (activeTab === 'onlineUsers') {
-        @if (onlineUserCount > 0) {
+         <!--@if (onlineUserCount > 0) {-->
           @for (user of onlineUsers$ | async; track user.id) {
             <div class="online-user chatroom" (click)="openPrivateChat(user.id)">
               <h3 class="online-name"><mat-icon class="online-icon">person</mat-icon> {{ user.name }}</h3>
             </div>
           }
-        } @else {
+        <!--} @else {
           <p class="no-online-users">No online users...</p>
-        }
+        }-->
       }
     </div>
   </div>

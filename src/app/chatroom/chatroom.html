@@ -2,8 +2,10 @@
     @if (roomId) {
         <div class="chatroom-header">
             <div class="details">
-                <h2 class="chat-title">{{ getChatroomName(chatroom$ | async) || 'Loading...' }}</h2>
-                <p class="members-count">Members: {{ (chatroom$ | async)?.members?.length || 0 }}</p>
+                <h2 class="chat-title" [ngClass]="(chatroom$ | async)?.type === 'group' ? 'group-name' : 'recipient-name'">{{ getChatroomName(chatroom$ | async) || 'Loading...' }}</h2>
+                @if ((chatroom$ | async)?.type === 'group') {
+                    <p class="members-count">Members: {{ (chatroom$ | async)?.members?.length || 0 }}</p>
+                }
             </div>
             <div class="actions">
                 @if ((chatroom$ | async)?.type === 'group') {
