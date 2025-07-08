@@ -16,6 +16,16 @@
     background: #f7fafd;
     overflow: hidden;
 }
+.chat-search-input {
+    width: 90%;
+    margin: 10px auto;
+    display: block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background-color: #fff;
+    font-size: 15px;
+}
 .add-room-btn {
     margin: auto auto;
     position: absolute;

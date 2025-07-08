@@ -14,7 +14,7 @@ import { UserProfile } from '../model/user';
 import { Room } from '../model/chatroom';
 import { ChatroomService } from '../services/chatroom';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -101,6 +101,8 @@ export class Chat {
   activeTab: 'chatrooms' | 'onlineUsers' = 'chatrooms';
   formatTimestamp = formatTimestamp;
   onlineUserCount = 0;
+  searchName$ = new BehaviorSubject<string>('');
+  filteredRooms$: Observable<any[]>;
   
   addRoomForm: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -177,6 +179,16 @@ export class Chat {
         return from(Promise.all(promises));
       })
     ); */
+    this.filteredRooms$ = combineLatest([
+      this.displayRooms$,
+      this.searchName$
+    ]).pipe(
+      map(([rooms, searchName]) => {
+        const name = searchName.trim().toLowerCase();
+        if (!name) return rooms;
+        return rooms.filter(room => room.name.toLowerCase().includes(name));
+      })
+    );
   }
 
   ngOnInit() {
@@ -185,7 +197,7 @@ export class Chat {
     });
   }
 
-  ngOnChanges() {
+  ngOnDestroy() {
     
   }
 
