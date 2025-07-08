@@ -1,5 +1,8 @@
 <div class="chat-layout">
   <div class="sidebar">
+    <!--<button class="sidebar-toggle" (click)="sidebarCollapsed = !sidebarCollapsed">
+      <mat-icon>{{ sidebarCollapsed ? 'menu' : 'menu' }}</mat-icon>
+    </button>-->
     <div class="sidebar-tabs">
       <button [class.active]="activeTab === 'chatrooms'" (click)="activeTab = 'chatrooms'">Chatrooms</button>
       <button [class.active]="activeTab === 'onlineUsers'" (click)="activeTab = 'onlineUsers'">Online Users</button>
@@ -9,7 +12,7 @@
         <button mat-fab color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
           <mat-icon>add</mat-icon>
         </button>
-        <input type="text" placeholder="Search chats..." [ngModel]="searchChat$.value" (ngModelChange)="searchChat$.next($event)" class="chat-search-input">
+        <div class="chat-search-div"><input type="text" placeholder="Search chats..." [ngModel]="searchChat$.value" (ngModelChange)="searchChat$.next($event)" class="chat-search-input"></div>
         @for (room of filteredRooms$ | async; track room.id) {
           <div (click)="openOrJoinChatroom(room)" [class.selected]="room.id === openedRoomId" class="chatroom">
             <h3>
@@ -38,8 +41,8 @@
         }
         
       } @else if (activeTab === 'onlineUsers') {
-         <!--@if (onlineUserCount > 0) {-->
-         <input type="text" placeholder="Search online users..." [ngModel]="searchUser$.value" (ngModelChange)="searchUser$.next($event)" class="chat-search-input">
+        <!--@if (onlineUserCount > 0) {-->
+        <input type="text" placeholder="Search online users..." [ngModel]="searchUser$.value" (ngModelChange)="searchUser$.next($event)" class="chat-search-input">
         @for (user of filteredUsers$ | async; track user.id) {
           <div class="online-user chatroom" (click)="openPrivateChat(user.id)">
             <h3 class="online-name"><mat-icon class="online-icon">person</mat-icon> {{ user.name }}</h3>

@@ -1,5 +1,5 @@
 .chat-icon {
-    margin-right: 10px;
+    margin: 0 10px 0 15px;
 }
 .title {
     margin-right: 20px;
@@ -21,6 +21,11 @@ html, body {
 mat-toolbar {
   flex: 0 0 auto;
   min-height: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
 }
 .router-content:has(> app-chat) {
   flex: 1 1 auto;

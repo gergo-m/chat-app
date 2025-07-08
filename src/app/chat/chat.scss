@@ -1,6 +1,5 @@
 button {
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-    border-radius: 50%;
     background-color: white;
     color: darkslateblue;
 }
@@ -21,6 +20,36 @@ button {
     border-right: 1px solid #e0e0e0;
     background: #f7fafd;
     overflow: hidden;
+    transition: width 0.2s;
+}
+/* .sidebar.collapsed {
+    width: 50px;
+}
+.sidebar .sidebar-content,
+.sidebar .sidebar-tabs,
+.sidebar .chat-search-input {
+    transition: opacity 0.2s, visibility 0.2s;
+}
+.sidebar.collapsed .sidebar-content,
+.sidebar.collapsed .sidebar-tabs,
+.sidebar.collapsed .chat-search-input {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    height: 0;
+}
+.sidebar-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+} */
+.chat-search-div {
+    position: sticky;
+    top: 0;
 }
 .chat-search-input {
     width: 90%;
@@ -38,6 +67,7 @@ button {
     bottom: 20px;
     right: 20px;
     z-index: 10;
+    border-radius: 50%;
 }
 .sidebar-tabs {
     display: flex;
@@ -147,3 +177,8 @@ h3 {
     font-style: italic;
     color: rgb(129, 162, 173);
 }
+
+
+/* responsivity */
+
+

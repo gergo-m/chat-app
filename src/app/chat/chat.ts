@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
@@ -25,6 +25,7 @@ import { getTimestampMillis, formatTimestamp, getCurrentUser } from '../util/uti
 import { JoinChatroomDialog } from './join-chatroom-dialog/join-chatroom-dialog';
 import { Collection } from '../util/constant';
 import { Chatroom } from '../chatroom/chatroom';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 interface ChatInfo {
   hasPrivateRoom: boolean;
@@ -45,7 +46,8 @@ interface ChatInfo {
     MatSelectModule,
     MatOptionModule,
     MatDialogModule,
-    Chatroom
+    Chatroom,
+    MatSidenavModule
 ],
   templateUrl: './chat.html',
   styleUrl: './chat.scss'
@@ -105,6 +107,8 @@ export class Chat {
   filteredRooms$: Observable<any[]>;
   searchUser$ = new BehaviorSubject<string>('');
   filteredUsers$: Observable<any[]>;
+  isMobile = false;
+  sidenavOpened = true;
   
   addRoomForm: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -207,6 +211,10 @@ export class Chat {
     this.users$.pipe().subscribe(users => {
         this.usersArray = users;
     });
+    this.isMobile = window.innerWidth < 768;
+    window.addEventListener('resize', () => {
+      this.isMobile = window.innerWidth < 768;
+    })
   }
 
   ngOnDestroy() {
@@ -265,6 +273,9 @@ export class Chat {
       console.log(room.lastMessageSeenBy);
       console.log(currentUserId);
       console.log(this.currentUserId);
+      if (this.isMobile) {
+        this.sidenavOpened = false;
+      }
       // this.router.navigate(['/chatroom', room.id]);
     } else {
       const dialogRef = this.dialog.open(JoinChatroomDialog, {
