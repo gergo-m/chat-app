@@ -1,14 +1,14 @@
 <div class="chat-layout">
   <div class="sidebar">
-    <button mat-raised-button color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
-      New chatroom <mat-icon>add</mat-icon>
-    </button>
     <div class="sidebar-tabs">
       <button [class.active]="activeTab === 'chatrooms'" (click)="activeTab = 'chatrooms'">Chatrooms</button>
       <button [class.active]="activeTab === 'onlineUsers'" (click)="activeTab = 'onlineUsers'">Online Users</button>
     </div>
     <div class="sidebar-content">
       @if (activeTab === 'chatrooms') {
+        <button mat-raised-button color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
+          New chatroom <mat-icon>add</mat-icon>
+        </button>
         @for (room of displayRooms$ | async; track room.id) {
           <div (click)="openOrJoinChatroom(room)" [class.selected]="room.id === openedRoomId" class="chatroom">
             <h3>
@@ -30,6 +30,7 @@
             </p>
           </div>
         }
+        
       } @else if (activeTab === 'onlineUsers') {
          <!--@if (onlineUserCount > 0) {-->
           @for (user of onlineUsers$ | async; track user.id) {

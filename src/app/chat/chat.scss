@@ -1,14 +1,27 @@
 .chat-layout {
     display: flex;
-    height: 100vh;
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
 }
 .sidebar {
     width: 300px;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
     border-right: 1px solid #e0e0e0;
     background: #f7fafd;
+    overflow: hidden;
 }
 .add-room-btn {
     margin: auto auto;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10;
 }
 .sidebar-tabs {
     display: flex;
@@ -27,9 +40,10 @@
     }
 }
 .sidebar-content {
+    flex: 1 1 auto;
     overflow-y: auto;
     min-height: 0;
-    max-height: 77vh;
+    padding-bottom: 70px;
 }
 .chat-detail {
     flex: 1 1 auto;
@@ -37,7 +51,7 @@
     background: #fff;
     display: flex;
     flex-direction: column;
-    height: fit-content;
+    min-height: 0;
 }
 
 .create-chatroom-container {

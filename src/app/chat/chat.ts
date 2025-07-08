@@ -266,7 +266,7 @@ export class Chat {
   }
 
   formatLastMessage(msg: string) {
-    return msg.length > 32 ? msg.slice(0, 33).trim() + '...' : msg;
+    return msg.length > 32 ? msg.slice(0, 24).trim() + '...' : msg;
   }
 
   isCurrentUser(userId: string) {
