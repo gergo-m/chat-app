@@ -9,7 +9,7 @@
         <button mat-fab color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
           <mat-icon>add</mat-icon>
         </button>
-        <input type="text" placeholder="Search chats..." [ngModel]="searchName$.value" (ngModelChange)="searchName$.next($event)" class="chat-search-input">
+        <input type="text" placeholder="Search chats..." [ngModel]="searchChat$.value" (ngModelChange)="searchChat$.next($event)" class="chat-search-input">
         @for (room of filteredRooms$ | async; track room.id) {
           <div (click)="openOrJoinChatroom(room)" [class.selected]="room.id === openedRoomId" class="chatroom">
             <h3>
@@ -34,11 +34,12 @@
         
       } @else if (activeTab === 'onlineUsers') {
          <!--@if (onlineUserCount > 0) {-->
-          @for (user of onlineUsers$ | async; track user.id) {
-            <div class="online-user chatroom" (click)="openPrivateChat(user.id)">
-              <h3 class="online-name"><mat-icon class="online-icon">person</mat-icon> {{ user.name }}</h3>
-            </div>
-          }
+         <input type="text" placeholder="Search online users..." [ngModel]="searchUser$.value" (ngModelChange)="searchUser$.next($event)" class="chat-search-input">
+        @for (user of filteredUsers$ | async; track user.id) {
+          <div class="online-user chatroom" (click)="openPrivateChat(user.id)">
+            <h3 class="online-name"><mat-icon class="online-icon">person</mat-icon> {{ user.name }}</h3>
+          </div>
+        }
         <!--} @else {
           <p class="no-online-users">No online users...</p>
         }-->

@@ -22,7 +22,7 @@ mat-toolbar {
   flex: 0 0 auto;
   min-height: 0;
 }
-.router-content {
+.router-content:has(> app-chat) {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;

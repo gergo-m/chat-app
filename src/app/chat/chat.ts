@@ -101,8 +101,10 @@ export class Chat {
   activeTab: 'chatrooms' | 'onlineUsers' = 'chatrooms';
   formatTimestamp = formatTimestamp;
   onlineUserCount = 0;
-  searchName$ = new BehaviorSubject<string>('');
+  searchChat$ = new BehaviorSubject<string>('');
   filteredRooms$: Observable<any[]>;
+  searchUser$ = new BehaviorSubject<string>('');
+  filteredUsers$: Observable<any[]>;
   
   addRoomForm: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -181,12 +183,22 @@ export class Chat {
     ); */
     this.filteredRooms$ = combineLatest([
       this.displayRooms$,
-      this.searchName$
+      this.searchChat$
     ]).pipe(
-      map(([rooms, searchName]) => {
-        const name = searchName.trim().toLowerCase();
-        if (!name) return rooms;
-        return rooms.filter(room => room.name.toLowerCase().includes(name));
+      map(([rooms, searchChat]) => {
+        const chatName = searchChat.trim().toLowerCase();
+        if (!chatName) return rooms;
+        return rooms.filter(room => room.name.toLowerCase().includes(chatName));
+      })
+    );
+    this.filteredUsers$ = combineLatest([
+      this.onlineUsers$,
+      this.searchUser$
+    ]).pipe(
+      map(([users, searchUser]) => {
+        const userName = searchUser.trim().toLowerCase();
+        if (!userName) return users;
+        return users.filter(user => user.name.toLowerCase().includes(userName));
       })
     );
   }
@@ -198,7 +210,7 @@ export class Chat {
   }
 
   ngOnDestroy() {
-    
+
   }
 
   async openCreateChatroomDialog() {
