@@ -25,7 +25,11 @@ export class MessageService {
       timestamp: new Date(),
       seenBy: [user.uid]
     });
-    await updateDoc(doc(this.firestore, `chatrooms/${roomId}`), { lastMessage: text, lastMessageTimestamp: new Date() })
+    await updateDoc(doc(this.firestore, `chatrooms/${roomId}`), {
+      lastMessage: text,
+      lastMessageTimestamp: new Date(),
+      lastMessageSeenBy: [user.uid]
+    });
   }
 
   getRoomMessages(roomId: string): Observable<Message[]> {

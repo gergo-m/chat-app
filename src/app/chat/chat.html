@@ -19,7 +19,7 @@
               }
               {{ room.name }}
             </h3>
-            <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : (!room.lastMessage ? 'no-messages' : '')" >
+            <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : (!room.lastMessage ? 'no-messages' : (room.lastMessageSeenBy && !room.lastMessageSeenBy.includes(currentUserId)) ? 'unread-message' : '')" >
             @if (isRestrictedAccess(room)) {
               {{ "Restricted access" }}
             } @else if (room.lastMessage) {

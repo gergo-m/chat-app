@@ -83,9 +83,13 @@ h3 {
 .last-message {
     margin-top: 5px;
     color: darkslategray;
+    align-items: center;
 }
 .special-access, .no-messages {
     font-style: italic;
+}
+.unread-message {
+    font-weight: bold;
 }
 .group-icon {
     margin-right: 5px;

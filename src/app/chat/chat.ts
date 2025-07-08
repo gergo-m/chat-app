@@ -58,6 +58,7 @@ export class Chat {
   chatroomService = inject(ChatroomService);
   user$: Observable<User | null> = user(this.auth);
   userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
+  currentUserId = this.auth.currentUser?.uid;
   chatroomCollection = collection(this.firestore, Collection.CHATROOMS);
   chatrooms$: Observable<Room[]>;
   userRooms$: Observable<Room[]> = this.user$.pipe(
@@ -184,6 +185,10 @@ export class Chat {
     });
   }
 
+  ngOnChanges() {
+    
+  }
+
   async openCreateChatroomDialog() {
     const currentUserId = this.auth.currentUser?.uid;
     const dialogRef = this.dialog.open(CreateChatroomDialog, {
@@ -229,6 +234,13 @@ export class Chat {
     if (room.members.includes(currentUserId)) {
       if (!room.id) return;
       this.openedRoomId = room.id;
+      const lastMessageSeenBy = Array.isArray(room.lastMessageSeenBy) ? room.lastMessageSeenBy : [];
+      if (!lastMessageSeenBy.includes(currentUserId)) {
+        this.chatroomService.updateRoomSeenBy(room.id, [...lastMessageSeenBy, currentUserId]);
+      }
+      console.log(room.lastMessageSeenBy);
+      console.log(currentUserId);
+      console.log(this.currentUserId);
       // this.router.navigate(['/chatroom', room.id]);
     } else {
       const dialogRef = this.dialog.open(JoinChatroomDialog, {

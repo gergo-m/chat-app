@@ -42,6 +42,10 @@ export class ChatroomService {
     await updateDoc(doc(this.firestore, `chatrooms/${roomId}`), { name: newName, members: newMembers });
   }
 
+  async updateRoomSeenBy(roomId: string, newLastMessageSeenBy: string[]) {
+    await updateDoc(doc(this.firestore, `chatrooms/${roomId}`), { lastMessageSeenBy: newLastMessageSeenBy });
+  }
+
   async deleteRoom(roomId: string) {
     await deleteDoc(doc(this.firestore, `chatrooms/${roomId}`));
   }
