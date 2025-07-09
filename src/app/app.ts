@@ -5,8 +5,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { Auth } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
-import { MatButton, MatButtonModule } from '@angular/material/button';
-import { PresenceService } from './services/presence';
+import { MatButtonModule } from '@angular/material/button';
+import { SidenavService } from './services/sidenav';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +27,7 @@ export class App {
   auth = inject(Auth);
   router = inject(Router);
 
-  constructor(private presence: PresenceService) {}
+  constructor(private sidenavService: SidenavService) {}
 
   get user() {
     return this.auth.currentUser;
@@ -44,5 +44,9 @@ export class App {
 
   register() {
     this.router.navigate(['/register']);
+  }
+
+  onMenuClick() {
+    this.sidenavService.toggle();
   }
 }

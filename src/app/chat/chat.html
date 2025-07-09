@@ -1,63 +1,6 @@
 <div class="chat-layout">
-  <div class="sidebar">
-    <!--<button class="sidebar-toggle" (click)="sidebarCollapsed = !sidebarCollapsed">
-      <mat-icon>{{ sidebarCollapsed ? 'menu' : 'menu' }}</mat-icon>
-    </button>-->
-    <div class="sidebar-tabs">
-      <button [class.active]="activeTab === 'chatrooms'" (click)="activeTab = 'chatrooms'">Chatrooms</button>
-      <button [class.active]="activeTab === 'onlineUsers'" (click)="activeTab = 'onlineUsers'">Online Users</button>
-    </div>
-    <div class="sidebar-content">
-      @if (activeTab === 'chatrooms') {
-        <button mat-fab color="primary" class="add-room-btn" (click)="openCreateChatroomDialog()">
-          <mat-icon>add</mat-icon>
-        </button>
-        <div class="chat-search-div"><input type="text" placeholder="Search chats..." [ngModel]="searchChat$.value" (ngModelChange)="searchChat$.next($event)" class="chat-search-input"></div>
-        @for (room of filteredRooms$ | async; track room.id) {
-          <div (click)="openOrJoinChatroom(room)" [class.selected]="room.id === openedRoomId" class="chatroom">
-            <h3>
-              @if (room.type === 'group') {
-                <mat-icon class="group-icon">group</mat-icon>
-              } @else if (room.type === 'private') {
-                <mat-icon class="private-icon" [ngClass]="(onlineUids$ | async)?.includes(room.otherUid) ? 'online-icon' : ''">person</mat-icon>
-              }
-              {{ room.name }}
-            </h3>
-            <div class="last-message-container">
-              <p class="last-message" [ngClass]="isRestrictedAccess(room) ? 'special-access' : (!room.lastMessage ? 'no-messages' : (room.lastMessageSeenBy && !room.lastMessageSeenBy.includes(currentUserId)) ? 'unread-message' : '')" >
-              @if (isRestrictedAccess(room)) {
-                {{ "Restricted access" }}
-              } @else if (room.lastMessage) {
-                {{ room.lastMessage }}
-              } @else {
-                {{ "No messages yet..." }}
-              }
-              </p>
-              @if (!isRestrictedAccess(room) && room.lastMessage) {
-                <p class="last-message-timestamp">{{ formatTimestamp(room.lastMessageTimestamp) }}</p>
-              }
-            </div>
-          </div>
-        }
-        
-      } @else if (activeTab === 'onlineUsers') {
-        <!--@if (onlineUserCount > 0) {-->
-        <input type="text" placeholder="Search online users..." [ngModel]="searchUser$.value" (ngModelChange)="searchUser$.next($event)" class="chat-search-input">
-        @for (user of filteredUsers$ | async; track user.id) {
-          <div class="online-user chatroom" (click)="openPrivateChat(user.id)">
-            <h3 class="online-name"><mat-icon class="online-icon">person</mat-icon> {{ user.name }}</h3>
-          </div>
-        }
-        <!--} @else {
-          <p class="no-online-users">No online users...</p>
-        }-->
-      }
-    </div>
-  </div>
-  <!--<div class="user-list">
-      <app-user-list></app-user-list>
-  </div>-->
+  <app-chatlist-sidenav></app-chatlist-sidenav>
   <div class="chat-detail">
-    <app-chatroom [roomId]="openedRoomId"></app-chatroom>
+    
   </div>
 </div>

@@ -33,3 +33,18 @@ mat-toolbar {
   display: flex;
   overflow: hidden;
 }
+.menu-icon {
+  margin: 5px;
+}
+
+@media (max-width: 900px) {
+  .toolbar-options {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .toolbar-option-title, .chat-icon, .title {
+    display: none;
+  }
+}

@@ -36,7 +36,7 @@
 
         <div class="send-message-container">
             <form [formGroup]="sendForm" (ngSubmit)="sendMessage()">
-                <mat-form-field class="message-input">
+                <mat-form-field appearance="outline" hideRequiredMarker class="message-input">
                     <mat-label>Send a message...</mat-label>
                     <input matInput formControlName="message" type="text">
                 </mat-form-field>
