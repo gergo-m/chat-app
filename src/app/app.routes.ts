@@ -25,11 +25,6 @@ export const routes: Routes = [
         canActivate: [ChatroomGuard]
     },
     {
-        path: 'users', title: 'Users',
-        loadComponent: () => import('./user-list/user-list').then(m => m.UserList),
-        canActivate: [UserGuard]
-    },
-    {
         path: '',
         loadComponent: () => import('./chat/chat').then(m => m.Chat),
         canActivate: [UserGuard],

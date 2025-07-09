@@ -13,8 +13,6 @@ export class MessageService {
   auth = inject(Auth);
   private firestore = inject(Firestore);
 
-  constructor() { }
-
   async sendMessage(roomId: string, text: string) {
     const user = this.auth.currentUser;
     if (!user) return;

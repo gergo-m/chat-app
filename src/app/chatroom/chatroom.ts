@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, inject, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
 import { Message } from '../shared/model/message';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -43,13 +43,14 @@ interface MessageWithPrevSender extends MessageWithSender {
   templateUrl: './chatroom.html',
   styleUrl: './chatroom.scss'
 })
-export class Chatroom {
+export class Chatroom implements OnInit, OnChanges, AfterViewChecked {
   route = inject(ActivatedRoute);
   firestore = inject(Firestore);
-  messageService = inject(MessageService);
-  chatroomService = inject(ChatroomService);
   auth = inject(Auth);
   router = inject(Router);
+  dialog = inject(MatDialog);
+  messageService = inject(MessageService);
+  chatroomService = inject(ChatroomService);
   formatTimestamp = formatTimestamp;
   formatTimestampFull = formatTimestampFull;
   displayDateAbove = displayDateAbove;
@@ -69,7 +70,7 @@ export class Chatroom {
 
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLDivElement>;
 
-  constructor(private dialog: MatDialog) {
+  constructor() {
     this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
   }
   

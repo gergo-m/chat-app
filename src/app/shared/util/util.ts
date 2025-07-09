@@ -28,7 +28,6 @@ export function formatTimestampFull(timestamp: { seconds: number; nanoseconds: n
   const millis = getTimestampMillis(timestamp);
   const date = new Date(millis);
   const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const monthName = date.toLocaleString('default', { month: 'short' });
   const day = date.getDate().toString().padStart(2, '0');
   const dayName = date.toLocaleString('default', { weekday: 'short' });

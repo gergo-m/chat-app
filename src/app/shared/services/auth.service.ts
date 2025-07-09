@@ -22,18 +22,18 @@ export class AuthService {
   firestore = inject(Firestore);
   user$: Observable<User | null>;
 
-  constructor(private firebaseAuth: Auth) {
+  constructor() {
     this.setSessionStoragePersistence();
-    this.user$ = user(this.firebaseAuth);
+    this.user$ = user(this.auth);
   }
 
   private async setSessionStoragePersistence(): Promise<void> {
-    await setPersistence(this.firebaseAuth, browserSessionPersistence);
+    await setPersistence(this.auth, browserSessionPersistence);
   }
 
   async register(email: string, password: string) {
     try {
-      const userCredential = await createUserWithEmailAndPassword(this.firebaseAuth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
       return userCredential;
     } catch (error) {
       console.error("User register error:", error);
@@ -42,12 +42,12 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const userCredential = await signInWithEmailAndPassword(this.firebaseAuth, email, password);
+    const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
     return userCredential;
   }
 
   logout() {
-    return signOut(this.firebaseAuth);
+    return signOut(this.auth);
   }
   
   async loginWithProvider(providerType: ProviderType) {

@@ -25,9 +25,9 @@
                         <div class="message-date"> {{ formatTimestampFull(message.timestamp) }} </div>
                     }
                     @if (message.prev?.senderId !== message.senderId) {
-                        <div class="sender-name" [ngClass]="message.senderName == (userProfile$ | async)?.name ? 'self' : 'not-self'"> {{ message.senderName }} </div>
+                        <div class="sender-name" [ngClass]="message.senderName === (userProfile$ | async)?.name ? 'self' : 'not-self'"> {{ message.senderName }} </div>
                     }
-                    <div class="message" [ngClass]="message.senderName == (userProfile$ | async)?.name ? 'self' : 'not-self'" [title]="formatTimestampFull(message.timestamp)">
+                    <div class="message" [ngClass]="message.senderName === (userProfile$ | async)?.name ? 'self' : 'not-self'" [title]="formatTimestampFull(message.timestamp)">
                         {{ message.text }}
                     </div>
                 </div>

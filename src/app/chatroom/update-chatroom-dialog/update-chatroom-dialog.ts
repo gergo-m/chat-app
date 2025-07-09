@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
@@ -28,14 +28,13 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class UpdateChatroomDialog {
   updateRoomForm: FormGroup;
+  dialogRef = inject(MatDialogRef<UpdateChatroomDialog>);
+  data = inject(MAT_DIALOG_DATA) as { users: any[], currentUserId: string, currentName: string, currentParticipants: string[] };
 
-  constructor(
-    public dialogRef: MatDialogRef<UpdateChatroomDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: { users: any[], currentUserId: string, currentName: string, currentParticipants: string[] }
-  ) {
+  constructor() {
     this.updateRoomForm = new FormGroup({
-        name: new FormControl(data.currentName, [Validators.required, Validators.minLength(1)]),
-        participants: new FormControl(data.currentParticipants ? data.currentParticipants : [], [Validators.required])
+        name: new FormControl(this.data.currentName, [Validators.required, Validators.minLength(1)]),
+        participants: new FormControl(this.data.currentParticipants ? this.data.currentParticipants : [], [Validators.required])
       });
   }
 

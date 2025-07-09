@@ -8,8 +8,6 @@ export class SidenavService {
   private toggleSidenavSource = new Subject<void>();
   toggleSidenav$ = this.toggleSidenavSource.asObservable();
 
-  constructor() { }
-
   toggle() {
     this.toggleSidenavSource.next();
   }

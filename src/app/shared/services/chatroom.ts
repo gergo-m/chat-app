@@ -12,8 +12,6 @@ export class ChatroomService {
   private firestore = inject(Firestore);
   auth = inject(Auth);
 
-  constructor() { }
-
   async createChatroom(name: string, type: 'group' | 'private', visibility: 'public' | 'private' | 'password', password: string, members: string[]) {
     const chatroomRef = doc(collection(this.firestore, Collection.CHATROOMS));
     console.log(visibility, password);

@@ -32,9 +32,7 @@ export class Login {
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
   });
-  errorMessage: string = '';
-
-  constructor() {}
+  errorMessage = '';
 
   async login() {
     try {

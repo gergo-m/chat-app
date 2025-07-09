@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -25,12 +25,11 @@ import { ErrorMessage } from '../../shared/util/constant';
 })
 export class JoinChatroomDialog {
   joinRoomForm: FormGroup;
-  errorMessage: string = '';
+  errorMessage = '';
+  dialogRef = inject(MatDialogRef<JoinChatroomDialog>);
+  data = inject(MAT_DIALOG_DATA) as { roomName: string, roomVisibility: string, roomPassword: string };
 
-  constructor(
-    public dialogRef: MatDialogRef<JoinChatroomDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: { roomName: string, roomVisibility: string, roomPassword: string }
-  ) {
+  constructor() {
     this.joinRoomForm = new FormGroup({
       password: new FormControl('', [Validators.minLength(2)])
     });

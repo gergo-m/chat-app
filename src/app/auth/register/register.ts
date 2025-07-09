@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { AuthService } from '../../shared/services/auth.service';
-import { Router } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { Auth } from '@angular/fire/auth';
@@ -42,9 +41,9 @@ export class Register {
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
   });
-  errorMessage: string = '';
+  errorMessage = '';
 
-  constructor(private router: Router) {
+  constructor() {
     this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
   }
 

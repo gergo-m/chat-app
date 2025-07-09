@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
@@ -48,12 +48,15 @@ import { SidenavService } from '../../shared/services/sidenav';
   templateUrl: './chatlist-sidenav.html',
   styleUrl: './chatlist-sidenav.scss'
 })
-export class ChatlistSidenav {
+export class ChatlistSidenav implements OnInit, OnDestroy {
   firestore = inject(Firestore);
   auth = inject(Auth);
   router = inject(Router);
+  dialog = inject(MatDialog);
+  observer = inject(BreakpointObserver);
   chatService = inject(ChatroomService);
   chatroomService = inject(ChatroomService);
+  sidenavService = inject(SidenavService);
   user$: Observable<User | null> = user(this.auth);
   userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
   currentUserId = this.auth.currentUser?.uid;
@@ -91,7 +94,7 @@ export class ChatlistSidenav {
   userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<UserProfile[]>;
   usersArray: UserProfile[] = [];
-  openedRoomId: string = '';
+  openedRoomId = '';
   displayRooms$: Observable<any[]>;
   onlineUids$ = new BehaviorSubject<string[]>([]);
   onlineUsers$: Observable<UserProfile[]>;
@@ -113,11 +116,7 @@ export class ChatlistSidenav {
   private sub: Subscription;
   isMobile = true;
 
-  constructor(
-    private dialog: MatDialog,
-    private observer: BreakpointObserver,
-    private sidenavService: SidenavService
-  ) {
+  constructor() {
     this.chatrooms$ = collectionData(this.chatroomCollection, { idField: 'id' }) as Observable<Room[]>;
     this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
     this.user$.subscribe(currentUser => {
@@ -208,7 +207,7 @@ export class ChatlistSidenav {
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe;
+    this.sub.unsubscribe();
   }
 
   async openCreateChatroomDialog() {

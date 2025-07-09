@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router, RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -22,14 +22,15 @@ import { Subscription } from 'rxjs';
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {
+export class App implements OnDestroy {
   protected title = 'chat-app';
   firestore = inject(Firestore);
   auth = inject(Auth);
   router = inject(Router);
+  sidenavService = inject(SidenavService);
   userSub: Subscription;
 
-  constructor(private sidenavService: SidenavService) {
+  constructor() {
     this.userSub = user(this.auth).subscribe(currentUser => {
       if (currentUser && (this.router.url === '/login' || this.router.url === '/register')) {
         this.router.navigate(['/']);
