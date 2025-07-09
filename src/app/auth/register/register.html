@@ -14,8 +14,8 @@
             <input matInput type="password" formControlName="password" name="password" required>
         </mat-form-field>
         <button mat-flat-button type="submit" [disabled]="registerForm.invalid">Register</button>
-        <button mat-flat-button type="button" (click)="loginWithProvider(provider.GOOGLE)">Continue with Google</button>
-        <button mat-flat-button type="button" (click)="loginWithProvider(provider.GITHUB)">Continue with GitHub</button>
+        <button mat-flat-button type="button" (click)="authService.loginWithProvider(provider.GOOGLE)">Continue with Google</button>
+        <button mat-flat-button type="button" (click)="authService.loginWithProvider(provider.GITHUB)">Continue with GitHub</button>
         @if (errorMessage) {
         <p class="error"> {{ errorMessage }} </p>
         }

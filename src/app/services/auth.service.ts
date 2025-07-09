@@ -10,12 +10,16 @@ import {
     user,
     User
 } from '@angular/fire/auth';
-import { setPersistence } from "firebase/auth";
+import { GithubAuthProvider, setPersistence, updateProfile } from "firebase/auth";
 import { Observable } from 'rxjs';
+import { Collection, ProviderType } from "../util/constant";
+import { doc, getDoc, setDoc } from "@firebase/firestore";
+import { Firestore } from "@angular/fire/firestore";
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
   auth = inject(Auth);
+  firestore = inject(Firestore);
   user$: Observable<User | null>;
 
   constructor(private firebaseAuth: Auth) {
@@ -42,22 +46,41 @@ export class AuthService {
     return userCredential;
   }
 
-  // Logout current user
   logout() {
     return signOut(this.firebaseAuth);
   }
   
-  async googleLogin(): Promise<void> {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(this.firebaseAuth, provider);
-      const user = result.user;
-      if (!user) {
-        throw new Error('Google-Login error');
-      }
-    } catch (error) {
-      console.error('Google-Login error:', error);
-      throw error;
+  async loginWithProvider(providerType: ProviderType) {
+    let provider;
+    switch (providerType) {
+      case ProviderType.GOOGLE:
+        provider = new GoogleAuthProvider();
+        break;
+      case ProviderType.GITHUB:
+        provider = new GithubAuthProvider();
+        break;
+      default:
+        provider = ProviderType.INVALID;
+        break;
+    }
+    if (typeof provider === 'string') return;
+    const user = await signInWithPopup(this.auth, provider);
+    const userRef = await getDoc(doc(this.firestore, `users/${user.user.uid}`));
+    console.log(userRef.exists());
+    if (!userRef.exists()) {
+      const uid = user.user.uid;
+      const email = user.user.email;
+      const name = !user.user.displayName || user.user.displayName === email ? email?.substring(0, email.indexOf('@')) : user.user.displayName;
+      console.log(user);
+      console.log(user.user);
+      console.log(uid);
+      console.log(email);
+      console.log(name);
+      console.log(user.user.displayName);
+      await setDoc(doc(this.firestore, Collection.USERS, uid), {
+        name, email, createdAt: new Date()
+      });
+      await updateProfile(user.user, { displayName: name });
     }
   }
 }

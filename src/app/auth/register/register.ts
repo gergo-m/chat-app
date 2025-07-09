@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { collection, collectionData, doc, Firestore, setDoc } from '@angular/fire/firestore';
+import { collection, collectionData, doc, Firestore, getDoc, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { UserProfile } from '../../model/user';
 import { Collection, ErrorMessage, ProviderType } from '../../util/constant';
@@ -35,6 +35,7 @@ export class Register {
   provider = ProviderType;
   userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<UserProfile[]>;
+  authService = inject(AuthService);
   
   registerForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -43,7 +44,7 @@ export class Register {
   });
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private router: Router) {
     this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
   }
 
@@ -75,35 +76,5 @@ export class Register {
         this.errorMessage = ErrorMessage.UNEXPECTED_ERR;
       }
     }
-  }
-
-  async loginWithProvider(providerType: ProviderType) {
-    let provider;
-    switch (providerType) {
-      case ProviderType.GOOGLE:
-        provider = new GoogleAuthProvider();
-        break;
-      case ProviderType.GITHUB:
-        provider = new GithubAuthProvider();
-        break;
-      default:
-        provider = ProviderType.INVALID;
-        break;
-    }
-    if (typeof provider === 'string') return;
-    const user = await signInWithPopup(this.auth, provider);
-    const uid = user.user.uid;
-    const email = user.user.email;
-    const name = !user.user.displayName || user.user.displayName === email ? email?.substring(0, email.indexOf('@')) : user.user.displayName;
-    console.log(user);
-    console.log(user.user);
-    console.log(uid);
-    console.log(email);
-    console.log(name);
-    console.log(user.user.displayName);
-    await setDoc(doc(this.firestore, Collection.USERS, uid), {
-      name, email, createdAt: new Date()
-    });
-    await updateProfile(user.user, { displayName: name });
   }
 }

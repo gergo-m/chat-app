@@ -9,7 +9,8 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Auth, GoogleAuthProvider } from '@angular/fire/auth';
 import { GithubAuthProvider, signInWithPopup } from '@firebase/auth';
-import { ErrorMessage } from '../../util/constant';
+import { ErrorMessage, ProviderType } from '../../util/constant';
+import { Register } from '../register/register';
 
 @Component({
   selector: 'app-login',
@@ -27,6 +28,8 @@ import { ErrorMessage } from '../../util/constant';
 })
 export class Login {
   auth = inject(Auth);
+  authService = inject(AuthService);
+  provider = ProviderType;
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -34,7 +37,7 @@ export class Login {
   });
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor() {}
 
   async login() {
     try {
@@ -58,15 +61,5 @@ export class Login {
         this.errorMessage = ErrorMessage.UNEXPECTED_ERR;
       }
     }
-  }
-
-  async loginWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(this.auth, provider);
-  }
-
-  async loginWithGithub() {
-    const provider = new GithubAuthProvider();
-    await signInWithPopup(this.auth, provider);
   }
 }
