@@ -59,7 +59,7 @@ export class ChatlistSidenav implements OnDestroy {
   sidenavService = inject(SidenavService);
   user$: Observable<User | null> = user(this.auth);
   userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
-  currentUserId = this.auth.currentUser?.uid;
+  currentUserId = this.auth.currentUser?.uid ?? '';
   chatroomCollection = collection(this.firestore, Collection.CHATROOMS);
   chatrooms$: Observable<Room[]>;
   userRooms$: Observable<Room[]> = this.user$.pipe(
@@ -145,8 +145,9 @@ export class ChatlistSidenav implements OnDestroy {
       map(([rooms, currentUser, users]) => {
         return rooms.map(room => {
           if (room.type === 'private' && Array.isArray(room.members) && currentUser) {
-            const otherUid = room.members.find((uid: string) => uid !== currentUser.uid);
+            let otherUid = room.members.find((uid: string) => uid !== currentUser.uid);
             const otherUser = users.find((u: UserProfile) => u.id === otherUid);
+            if (!otherUid) otherUid = '';
             return {
               ...room,
               name: otherUser ? otherUser.name : 'Uknown room',

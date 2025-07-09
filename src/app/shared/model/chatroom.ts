@@ -12,4 +12,5 @@ export interface Room {
   lastMessageSeenBy: string[];
   visibility: Visibility;
   password?: string;
+  otherUid: string;
 }
