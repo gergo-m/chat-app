@@ -74,29 +74,35 @@ button {
     font-size: 13px;
 }
 .message {
-    background-color: rgb(255, 255, 255);
-    border-radius: 20px;
-    padding: 8px 15px;
-    margin: 2px 0 5px 0;
-    width: fit-content;
-    max-width: 1200px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 20px;
+  padding: 8px 15px;
+  margin: 2px 0 5px 0;
+  width: fit-content;
+  max-width: 1200px;
 }
 
 .message-date {
-    width: fit-content;
-    margin: 15px auto 0 auto;
-    color: rgb(167, 167, 167);
-    font-size: 13px;
+  width: fit-content;
+  margin: 15px auto 0 auto;
+  color: rgb(167, 167, 167);
+  font-size: 13px;
 }
 .self {
-    margin-left: auto;
+  margin-left: auto;
 }
 .message.self {
-    background-color: lightblue;
+  background-color: lightblue;
 }
 
 .send-message-container {
-    margin: 20px 5px 0 5px;
+  margin: 20px 5px 0 5px;
+}
+.send-message-container form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
 }
 
 .message-input {
@@ -104,6 +110,9 @@ button {
     border-radius: 15px;
     width: 90%;
     min-width: 200px;
+}
+.send-btn {
+  margin-bottom: 2.5vh;
 }
 
 .get-started {
@@ -118,7 +127,6 @@ button {
   .chatroom-container {
     margin: 10px 5vw;
     padding: 12px;
-    min-width: 0;
     max-width: 98vw;
   }
   .message {
@@ -126,7 +134,7 @@ button {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 660px) {
   .chatroom-container {
     margin: 0;
     padding: 0;
