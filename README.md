@@ -1,59 +1,45 @@
-# ChatApp
+# Angular Chat App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.4.
+An Angular SPA for real-time chat with:
 
-## Development server
+- **User registration and login** (email/password, Google, GitHub)
+- **Public, private, and password-protected chatrooms**
+- **Private messaging** between users
+- Online users list
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## Features
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Authentication**
+  - Register and login with email/password
+  - Sign in with Google or GitHub
 
-## Code scaffolding
+- **Chatrooms**
+  - Create public, private, or password-protected chatrooms
+  - Search and join existing chatrooms
+  - Send messages in chatrooms you're part of
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **Private Messaging**
+  - Start 1:1 conversations with any online user
+  - View and send messages in real time
 
-```bash
-ng generate component component-name
-```
+- **Online Presence**
+  - See which users are online
+  - Search online users
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- **UI Elements**
+  - Responsive layout with Angular Material
+  - Scrollable chatroom view
+  - Collapsible sidebar for chat list
+  - Floating action button to create new chatrooms
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+## Technical Overview
 
-To build the project run:
+### Tools and versions
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- [Node.js](https://nodejs.org/) (22.12.0)
+- [Angular CLI](https://angular.io/cli) (20.0.4)
+- [Firebase](https://firebase.google.com/) project (Firestore, Authentication, Realtime Database enabled)
