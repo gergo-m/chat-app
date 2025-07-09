@@ -57,40 +57,12 @@ export class ChatlistSidenav implements OnDestroy {
   chatService = inject(ChatroomService);
   chatroomService = inject(ChatroomService);
   sidenavService = inject(SidenavService);
-  user$: Observable<User | null> = user(this.auth);
-  userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
+  user$: Observable<User | null>;
+  userProfile$: Observable<UserProfile | null>;
   currentUserId = this.auth.currentUser?.uid ?? '';
   chatroomCollection = collection(this.firestore, Collection.CHATROOMS);
   chatrooms$: Observable<Room[]>;
-  userRooms$: Observable<Room[]> = this.user$.pipe(
-    switchMap(currentUser => {
-      if (!currentUser) return of([]);
-
-      const visibleRoomsQuery = query(
-        collection(this.firestore, Collection.CHATROOMS),
-        where('visibility', 'in', [Visibility.PUBLIC, Visibility.PASSWORD])
-      );
-      const publicRooms$ = collectionData(visibleRoomsQuery, { idField: 'id' }) as Observable<Room[]>;
-
-      const memberRoomsQuery = query(
-        collection(this.firestore, Collection.CHATROOMS),
-        where('visibility', '==', Visibility.PRIVATE),
-        where('members', 'array-contains', currentUser.uid)
-      );
-      const memberRooms$ = collectionData(memberRoomsQuery, { idField: 'id' }) as Observable<Room[]>;
-
-      return combineLatest([publicRooms$, memberRooms$]).pipe(
-        map(([publicRooms, memberRooms]) => {
-          const allRooms = [...publicRooms, ...memberRooms];
-          return allRooms.sort((a, b) => {
-            const aTime = getTimestampMillis(a.lastMessageTimestamp);
-            const bTime = getTimestampMillis(b.lastMessageTimestamp);
-            return bTime - aTime;
-          })
-        })
-      );
-    })
-  );
+  userRooms$: Observable<Room[]>;
   userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<UserProfile[]>;
   usersArray: UserProfile[] = [];
@@ -121,6 +93,8 @@ export class ChatlistSidenav implements OnDestroy {
 
   constructor() {
     this.chatrooms$ = collectionData(this.chatroomCollection, { idField: 'id' }) as Observable<Room[]>;
+    this.user$ = user(this.auth);
+    this.userProfile$ = getCurrentUser(this.user$, this.firestore);
     this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
     this.userSub = this.user$.subscribe(currentUser => {
       const initialParticipants = currentUser ? [currentUser.uid] : [];
@@ -137,6 +111,35 @@ export class ChatlistSidenav implements OnDestroy {
       );
       this.onlineUids$.next(onlineUids);
     });
+    this.userRooms$ = this.user$.pipe(
+      switchMap(currentUser => {
+        if (!currentUser) return of([]);
+
+        const visibleRoomsQuery = query(
+          collection(this.firestore, Collection.CHATROOMS),
+          where('visibility', 'in', [Visibility.PUBLIC, Visibility.PASSWORD])
+        );
+        const publicRooms$ = collectionData(visibleRoomsQuery, { idField: 'id' }) as Observable<Room[]>;
+
+        const memberRoomsQuery = query(
+          collection(this.firestore, Collection.CHATROOMS),
+          where('visibility', '==', Visibility.PRIVATE),
+          where('members', 'array-contains', currentUser.uid)
+        );
+        const memberRooms$ = collectionData(memberRoomsQuery, { idField: 'id' }) as Observable<Room[]>;
+
+        return combineLatest([publicRooms$, memberRooms$]).pipe(
+          map(([publicRooms, memberRooms]) => {
+            const allRooms = [...publicRooms, ...memberRooms];
+            return allRooms.sort((a, b) => {
+              const aTime = getTimestampMillis(a.lastMessageTimestamp);
+              const bTime = getTimestampMillis(b.lastMessageTimestamp);
+              return bTime - aTime;
+            })
+          })
+        );
+      })
+    );
     this.displayRooms$ = combineLatest([
       this.userRooms$,
       this.user$,
