@@ -1,16 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule, Validators, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+import { AuthService } from '../../shared/services/auth.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { Auth, GoogleAuthProvider } from '@angular/fire/auth';
-import { GithubAuthProvider, signInWithPopup } from '@firebase/auth';
-import { ErrorMessage, ProviderType } from '../../util/constant';
-import { Register } from '../register/register';
+import { Auth } from '@angular/fire/auth';
+import { ErrorMessage, ProviderType } from '../../shared/util/constant';
 
 @Component({
   selector: 'app-login',

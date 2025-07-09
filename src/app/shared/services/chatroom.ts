@@ -9,7 +9,7 @@ import { Auth } from '@angular/fire/auth';
   providedIn: 'root'
 })
 export class ChatroomService {
-  firestore = inject(Firestore);
+  private firestore = inject(Firestore);
   auth = inject(Auth);
 
   constructor() { }

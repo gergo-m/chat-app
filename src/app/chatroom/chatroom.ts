@@ -1,23 +1,23 @@
 import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
 import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
-import { Message } from '../model/message';
+import { Message } from '../shared/model/message';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from '../services/message';
-import { ChatroomService } from '../services/chatroom';
-import { collection, collectionData, doc, docData, Firestore } from '@angular/fire/firestore';
-import { Room } from '../model/chatroom';
+import { MessageService } from '../shared/services/message';
+import { ChatroomService } from '../shared/services/chatroom';
+import { collection, collectionData, Firestore } from '@angular/fire/firestore';
+import { Room } from '../shared/model/chatroom';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { UserProfile } from '../model/user';
+import { UserProfile } from '../shared/model/user';
 import { Auth, user, User } from '@angular/fire/auth';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateChatroomDialog } from './update-chatroom-dialog/update-chatroom-dialog';
-import { displayDateAbove, formatTimestamp, formatTimestampFull, getCurrentUser } from '../util/util';
-import { Collection } from '../util/constant';
+import { displayDateAbove, formatTimestamp, formatTimestampFull, getCurrentUser } from '../shared/util/util';
+import { Collection } from '../shared/util/constant';
 
 interface MessageWithSender extends Message {
   senderName?: string;
@@ -55,15 +55,8 @@ export class Chatroom {
   displayDateAbove = displayDateAbove;
   user$: Observable<User | null> = user(this.auth);
   userProfile$: Observable<UserProfile | null> = getCurrentUser(this.user$, this.firestore);
-  // roomId = this.route.snapshot.params['id'];
   @Input() roomId!: string;
-  chatroom$!: Observable<Room | undefined>; /* = this.route.params.pipe(
-    switchMap(params => {
-      const roomId = params['id'];
-      return this.chatroomService.getChatroom(this.roomId);
-    })
-  ); */
-  // chatroom$: Observable<Room | undefined> =  this.chatroomService.getChatroom(this.roomId);
+  chatroom$!: Observable<Room | undefined>;
   userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<UserProfile[]>;
   usersArray: UserProfile[] = [];

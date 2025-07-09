@@ -1,16 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { Auth, updateEmail, updatePassword, updateProfile, user, User } from '@angular/fire/auth';
-import { doc, docData, Firestore } from '@angular/fire/firestore';
+import { doc, Firestore } from '@angular/fire/firestore';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable, of, switchMap } from 'rxjs';
-import { UserProfile } from '../model/user';
+import { Observable } from 'rxjs';
+import { UserProfile } from '../shared/model/user';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { updateDoc } from '@firebase/firestore';
 import { MatButton } from '@angular/material/button';
-import { getCurrentUser } from '../util/util';
-import { Collection } from '../util/constant';
+import { getCurrentUser } from '../shared/util/util';
+import { Collection } from '../shared/util/constant';
 
 @Component({
   selector: 'app-profile',

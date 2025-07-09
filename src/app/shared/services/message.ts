@@ -11,7 +11,7 @@ import { Collection } from '../util/constant';
 })
 export class MessageService {
   auth = inject(Auth);
-  firestore = inject(Firestore);
+  private firestore = inject(Firestore);
 
   constructor() { }
 

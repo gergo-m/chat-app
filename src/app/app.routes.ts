@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { GuestGuard } from './guards/guest-guard';
-import { UserGuard } from './guards/user-guard';
-import { ChatroomGuard } from './guards/chatroom-guard-guard';
+import { GuestGuard } from './shared/guards/guest-guard';
+import { UserGuard } from './shared/guards/user-guard';
+import { ChatroomGuard } from './shared/guards/chatroom-guard-guard';
 
 export const routes: Routes = [
     {

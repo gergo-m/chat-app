@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Auth, user } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
 import { MatButtonModule } from '@angular/material/button';
-import { SidenavService } from './services/sidenav';
+import { SidenavService } from './shared/services/sidenav';
 import { Subscription } from 'rxjs';
 
 @Component({

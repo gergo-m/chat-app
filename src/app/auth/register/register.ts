@@ -1,18 +1,18 @@
 import { Component, inject } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatButtonModule } from '@angular/material/button';
-import { Auth, GoogleAuthProvider } from '@angular/fire/auth';
-import { GithubAuthProvider, signInWithPopup, updateProfile } from '@firebase/auth';
+import { Auth } from '@angular/fire/auth';
+import { updateProfile } from '@firebase/auth';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { collection, collectionData, doc, Firestore, getDoc, setDoc } from '@angular/fire/firestore';
+import { collection, collectionData, doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { UserProfile } from '../../model/user';
-import { Collection, ErrorMessage, ProviderType } from '../../util/constant';
+import { UserProfile } from '../../shared/model/user';
+import { Collection, ErrorMessage, ProviderType } from '../../shared/util/constant';
 
 @Component({
   selector: 'app-register',

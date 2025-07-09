@@ -1,32 +1,32 @@
-import { Component, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
-import { Firestore, collection, collectionData, docData } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, from, map, Observable, of, Subscription, switchMap } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, of, Subscription, switchMap } from 'rxjs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { query, where } from '@firebase/firestore';
-import { UserProfile } from '../../model/user';
-import { Room } from '../../model/chatroom';
-import { ChatroomService } from '../../services/chatroom';
+import { UserProfile } from '../../shared/model/user';
+import { Room } from '../../shared/model/chatroom';
+import { ChatroomService } from '../../shared/services/chatroom';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormControl, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateChatroomDialog } from '../create-chatroom-dialog/create-chatroom-dialog';
 import { getDatabase, onValue, ref } from '@firebase/database';
-import { getTimestampMillis, formatTimestamp, getCurrentUser } from '../../util/util';
+import { getTimestampMillis, formatTimestamp, getCurrentUser } from '../../shared/util/util';
 import { JoinChatroomDialog } from '../join-chatroom-dialog/join-chatroom-dialog';
-import { Collection } from '../../util/constant';
+import { Collection } from '../../shared/util/constant';
 import { Chatroom } from '../../chatroom/chatroom';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { SidenavService } from '../../services/sidenav';
+import { SidenavService } from '../../shared/services/sidenav';
 
 @Component({
   selector: 'app-chatlist-sidenav',
@@ -95,7 +95,6 @@ export class ChatlistSidenav {
   displayRooms$: Observable<any[]>;
   onlineUids$ = new BehaviorSubject<string[]>([]);
   onlineUsers$: Observable<UserProfile[]>;
-  // onlineUsersWithChatInfo$: Observable<UserProfile & ChatInfo>;
   activeTab: 'chatrooms' | 'onlineUsers' = 'chatrooms';
   formatTimestamp = formatTimestamp;
   onlineUserCount = 0;
@@ -267,7 +266,6 @@ export class ChatlistSidenav {
       if (this.isMobile) {
         this.sidenav.toggle();
       }
-      // this.router.navigate(['/chatroom', room.id]);
     } else {
       const dialogRef = this.dialog.open(JoinChatroomDialog, {
         width: '400px',
@@ -285,7 +283,6 @@ export class ChatlistSidenav {
           if (!room.id) return;
           this.chatroomService.updateRoom(room.id, room.name, newMembers);
           this.openedRoomId = room.id;
-          // this.router.navigate(['/chatroom', room.id]);
         }
       });
     }
