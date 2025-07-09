@@ -66,17 +66,10 @@ export class AuthService {
     if (typeof provider === 'string') return;
     const user = await signInWithPopup(this.auth, provider);
     const userRef = await getDoc(doc(this.firestore, `users/${user.user.uid}`));
-    console.log(userRef.exists());
     if (!userRef.exists()) {
       const uid = user.user.uid;
       const email = user.user.email;
       const name = !user.user.displayName || user.user.displayName === email ? email?.substring(0, email.indexOf('@')) : user.user.displayName;
-      console.log(user);
-      console.log(user.user);
-      console.log(uid);
-      console.log(email);
-      console.log(name);
-      console.log(user.user.displayName);
       await setDoc(doc(this.firestore, Collection.USERS, uid), {
         name, email, createdAt: new Date()
       });

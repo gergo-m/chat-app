@@ -41,7 +41,5 @@ export class PresenceService implements OnDestroy {
         set(userStatusDatabaseRef, isOnlineForDatabase);
       });
     });
-    console.log("done");
-    console.log(uid, userStatusDatabaseRef.toString());
   }
 }

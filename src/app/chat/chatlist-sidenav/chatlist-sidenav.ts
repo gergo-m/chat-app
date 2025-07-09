@@ -261,9 +261,6 @@ export class ChatlistSidenav implements OnDestroy {
       if (!lastMessageSeenBy.includes(currentUserId)) {
         this.chatroomService.updateRoomSeenBy(room.id, [...lastMessageSeenBy, currentUserId]);
       }
-      console.log(room.lastMessageSeenBy);
-      console.log(currentUserId);
-      console.log(this.currentUserId);
       if (this.isMobile) {
         this.sidenav.toggle();
       }

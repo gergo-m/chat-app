@@ -14,7 +14,6 @@ export class ChatroomService {
 
   async createChatroom(name: string, type: 'group' | 'private', visibility: Visibility, password: string, members: string[]) {
     const chatroomRef = doc(collection(this.firestore, Collection.CHATROOMS));
-    console.log(visibility, password);
     await setDoc(chatroomRef, {
       name, type, members,
       ownerId: this.auth.currentUser?.uid,
