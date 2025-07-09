@@ -142,6 +142,7 @@ h3 {
     flex-direction: row;
     gap: 8px;
     align-items: center;
+    white-space: nowrap;
 }
 .last-message, .last-message-timestamp {
     margin-top: 5px;

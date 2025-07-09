@@ -33,7 +33,7 @@
                         }
                         </p>
                         @if (!isRestrictedAccess(room) && room.lastMessage) {
-                            <p class="last-message-timestamp">{{ formatTimestamp(room.lastMessageTimestamp) }}</p>
+                            <p class="last-message-timestamp">{{ formatTimestampForList(room.lastMessageTimestamp) }}</p>
                         }
                         </div>
                     </a>

@@ -24,19 +24,35 @@ export function formatTimestamp(timestamp: { seconds: number; nanoseconds: numbe
   return `${hours}:${minutes}`;
 }
 
+export function formatTimestampForList(timestamp: { seconds: number, nanoseconds: number} | Date | string) {
+  const millis = getTimestampMillis(timestamp);
+  const date = new Date(millis);
+  const year = date.getFullYear();
+  const monthName = date.toLocaleString('default', { month: 'short' });
+  const day = date.getDate().toString();
+  const dayName = date.toLocaleString('default', { weekday: 'short' });
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const now = new Date();
+  if (date.getFullYear() !== now.getFullYear()) return `${monthName} ${day}, ${year}`;
+  if ((date.getMonth() === now.getMonth() && (now.getDate() === date.getDate() || (Math.abs(now.getDate() - date.getDate()) === 1 && now.getHours() < date.getHours())))) return `${hours}:${minutes}`;
+  if ((date.getDay() != now.getDay()) && Math.abs(now.getDate() - date.getDate()) < 7) return `${dayName}`;
+  return `${monthName} ${day} at ${hours}:${minutes}`;
+}
+
 export function formatTimestampFull(timestamp: { seconds: number; nanoseconds: number } | Date | string) {
   const millis = getTimestampMillis(timestamp);
   const date = new Date(millis);
   const year = date.getFullYear();
   const monthName = date.toLocaleString('default', { month: 'short' });
-  const day = date.getDate().toString().padStart(2, '0');
+  const day = date.getDate().toString();
   const dayName = date.toLocaleString('default', { weekday: 'short' });
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const now = new Date();
-  if (date.getFullYear() !== now.getFullYear()) return `${year} ${monthName} ${day} at ${hours}:${minutes}`;
+  if (date.getFullYear() !== now.getFullYear()) return `${monthName} ${day}, ${year} at ${hours}:${minutes}`;
   if ((date.getDay() != now.getDay()) && Math.abs(now.getDate() - date.getDate()) < 7) return `${dayName} at ${hours}:${minutes}`;
-  if (date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) return `${hours}:${minutes}`;
+  if ((date.getMonth() === now.getMonth() && (now.getDate() === date.getDate() || (Math.abs(now.getDate() - date.getDate()) === 1 && now.getHours() < date.getHours())))) return `${hours}:${minutes}`;
   return `${monthName} ${day} at ${hours}:${minutes}`;
 }
 

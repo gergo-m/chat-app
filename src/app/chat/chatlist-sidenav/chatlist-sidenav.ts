@@ -20,7 +20,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateChatroomDialog } from '../create-chatroom-dialog/create-chatroom-dialog';
 import { getDatabase, onValue, ref } from '@firebase/database';
-import { getTimestampMillis, formatTimestamp, getCurrentUser } from '../../shared/util/util';
+import { getTimestampMillis, getCurrentUser, formatTimestampForList } from '../../shared/util/util';
 import { JoinChatroomDialog } from '../join-chatroom-dialog/join-chatroom-dialog';
 import { Collection } from '../../shared/util/constant';
 import { Chatroom } from '../../chatroom/chatroom';
@@ -99,7 +99,7 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
   onlineUids$ = new BehaviorSubject<string[]>([]);
   onlineUsers$: Observable<UserProfile[]>;
   activeTab: 'chatrooms' | 'onlineUsers' = 'chatrooms';
-  formatTimestamp = formatTimestamp;
+  formatTimestampForList = formatTimestampForList;
   onlineUserCount = 0;
   searchChat$ = new BehaviorSubject<string>('');
   filteredRooms$: Observable<any[]>;
