@@ -123,18 +123,20 @@ button {
 
 
 
-@media (max-width: 900px) {
+@media (max-width: 1020px) {
   .chatroom-container {
     margin: 10px 5vw;
     padding: 12px;
-    max-width: 98vw;
+    min-width: 50vw;
+    width: 70vw;
+    max-width: 90vw;
   }
   .message {
     max-width: 80vw;
   }
 }
 
-@media (max-width: 660px) {
+@media (max-width: 600px) {
   .chatroom-container {
     margin: 0;
     padding: 0;
