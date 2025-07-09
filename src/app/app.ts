@@ -8,6 +8,7 @@ import { Firestore } from '@angular/fire/firestore';
 import { MatButtonModule } from '@angular/material/button';
 import { SidenavService } from './shared/services/sidenav';
 import { Subscription } from 'rxjs';
+import { PresenceService } from './shared/services/presence';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +30,7 @@ export class App implements OnDestroy {
   router = inject(Router);
   sidenavService = inject(SidenavService);
   userSub: Subscription;
+  presenceService = inject(PresenceService);
 
   constructor() {
     this.userSub = user(this.auth).subscribe(currentUser => {

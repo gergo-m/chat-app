@@ -3,6 +3,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router, UrlTree } from '@angular/r
 import { Auth } from '@angular/fire/auth';
 import { doc, Firestore, getDoc } from '@angular/fire/firestore';
 import { Collection } from '../util/constant';
+import { Room } from '../model/chatroom';
 
 @Injectable({ providedIn: 'root' })
 export class ChatroomGuard implements CanActivate {
@@ -19,7 +20,7 @@ export class ChatroomGuard implements CanActivate {
     if (!roomSnap.exists()) {
       return this.router.parseUrl('/');
     }
-    const room = roomSnap.data() as any;
+    const room = roomSnap.data() as Room;
 
     if (!Array.isArray(room.members) || !room.members.includes(user.uid)) {
       return this.router.parseUrl('/');

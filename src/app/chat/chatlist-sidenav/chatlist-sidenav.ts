@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
@@ -22,7 +22,7 @@ import { CreateChatroomDialog } from '../create-chatroom-dialog/create-chatroom-
 import { getDatabase, onValue, ref } from '@firebase/database';
 import { getTimestampMillis, getCurrentUser, formatTimestampForList } from '../../shared/util/util';
 import { JoinChatroomDialog } from '../join-chatroom-dialog/join-chatroom-dialog';
-import { Collection } from '../../shared/util/constant';
+import { Collection, Visibility } from '../../shared/util/constant';
 import { Chatroom } from '../../chatroom/chatroom';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -48,7 +48,7 @@ import { SidenavService } from '../../shared/services/sidenav';
   templateUrl: './chatlist-sidenav.html',
   styleUrl: './chatlist-sidenav.scss'
 })
-export class ChatlistSidenav implements OnInit, OnDestroy {
+export class ChatlistSidenav implements OnDestroy {
   firestore = inject(Firestore);
   auth = inject(Auth);
   router = inject(Router);
@@ -68,13 +68,13 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
 
       const visibleRoomsQuery = query(
         collection(this.firestore, Collection.CHATROOMS),
-        where('visibility', 'in', ['public', 'password'])
+        where('visibility', 'in', [Visibility.PUBLIC, Visibility.PASSWORD])
       );
       const publicRooms$ = collectionData(visibleRoomsQuery, { idField: 'id' }) as Observable<Room[]>;
 
       const memberRoomsQuery = query(
         collection(this.firestore, Collection.CHATROOMS),
-        where('visibility', '==', 'private'),
+        where('visibility', '==', Visibility.PRIVATE),
         where('members', 'array-contains', currentUser.uid)
       );
       const memberRooms$ = collectionData(memberRoomsQuery, { idField: 'id' }) as Observable<Room[]>;
@@ -95,17 +95,20 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
   users$: Observable<UserProfile[]>;
   usersArray: UserProfile[] = [];
   openedRoomId = '';
-  displayRooms$: Observable<any[]>;
+  displayRooms$: Observable<Room[]>;
   onlineUids$ = new BehaviorSubject<string[]>([]);
   onlineUsers$: Observable<UserProfile[]>;
   activeTab: 'chatrooms' | 'onlineUsers' = 'chatrooms';
   formatTimestampForList = formatTimestampForList;
   onlineUserCount = 0;
   searchChat$ = new BehaviorSubject<string>('');
-  filteredRooms$: Observable<any[]>;
+  filteredRooms$: Observable<Room[]>;
   searchUser$ = new BehaviorSubject<string>('');
-  filteredUsers$: Observable<any[]>;
+  filteredUsers$: Observable<UserProfile[]>;
   sidenavOpened = true;
+  userSub: Subscription;
+  usersArraySub: Subscription;
+  observerSub: Subscription;
   
   addRoomForm: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -119,7 +122,7 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
   constructor() {
     this.chatrooms$ = collectionData(this.chatroomCollection, { idField: 'id' }) as Observable<Room[]>;
     this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
-    this.user$.subscribe(currentUser => {
+    this.userSub = this.user$.subscribe(currentUser => {
       const initialParticipants = currentUser ? [currentUser.uid] : [];
       this.addRoomForm = new FormGroup({
         name: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -143,7 +146,7 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
         return rooms.map(room => {
           if (room.type === 'private' && Array.isArray(room.members) && currentUser) {
             const otherUid = room.members.find((uid: string) => uid !== currentUser.uid);
-            const otherUser = users.find((u: any) => u.id === otherUid);
+            const otherUser = users.find((u: UserProfile) => u.id === otherUid);
             return {
               ...room,
               name: otherUser ? otherUser.name : 'Uknown room',
@@ -159,15 +162,6 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
         })
       })
     );
-    this.onlineUsers$ = combineLatest([
-      this.users$,
-      this.onlineUids$
-    ]).pipe(
-      map(([users, onlineUids]) => {
-        this.onlineUserCount++;
-        return users.filter(user => onlineUids.includes(user.id) && user.id !== this.auth.currentUser?.uid);
-      })
-    );
     this.filteredRooms$ = combineLatest([
       this.displayRooms$,
       this.searchChat$
@@ -176,6 +170,15 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
         const chatName = searchChat.trim().toLowerCase();
         if (!chatName) return rooms;
         return rooms.filter(room => room.name.toLowerCase().includes(chatName));
+      })
+    );
+    this.onlineUsers$ = combineLatest([
+      this.users$,
+      this.onlineUids$
+    ]).pipe(
+      map(([users, onlineUids]) => {
+        this.onlineUserCount++;
+        return users.filter(user => onlineUids.includes(user.id) && user.id !== this.auth.currentUser?.uid);
       })
     );
     this.filteredUsers$ = combineLatest([
@@ -191,13 +194,10 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
     this.sub = this.sidenavService.toggleSidenav$.subscribe(() => {
       this.sidenav.toggle();
     });
-  }
-
-  ngOnInit() {
-    this.users$.pipe().subscribe(users => {
+    this.usersArraySub = this.users$.pipe().subscribe(users => {
         this.usersArray = users;
     });
-    this.observer.observe(['(max-width: 1020px']).subscribe((screenSize) => {
+    this.observerSub = this.observer.observe(['(max-width: 1020px']).subscribe((screenSize) => {
       if (screenSize.matches) {
         this.isMobile = true;
       } else {
@@ -208,6 +208,9 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub.unsubscribe();
+    this.userSub.unsubscribe();
+    this.usersArraySub.unsubscribe();
+    this.observerSub.unsubscribe();
   }
 
   async openCreateChatroomDialog() {
@@ -229,14 +232,13 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
 
   async createChatroom() {
     const name = this.addRoomForm.get('name')?.value || '';
-    const visibility = this.addRoomForm.get('visibility')?.value || 'private';
+    const visibility = this.addRoomForm.get('visibility')?.value || Visibility.PRIVATE;
     const password = this.addRoomForm.get('password')?.value || '';
     const participants = this.addRoomForm.get('participants')?.value || [];
     if (!this.auth.currentUser || !name.trim()) return;
-    const validVisibilities = ['public', 'private', 'password'] as const;
-    if (!validVisibilities.includes(visibility as any)) return;
-    this.chatroomService.createChatroom(name, 'group', visibility as 'public' | 'private' | 'password', password, participants);
-    this.addRoomForm.reset({ type: 'private' });
+    if (!Object.values(Visibility).includes(visibility)) return;
+    this.chatroomService.createChatroom(name, 'group', visibility as Visibility, password, participants);
+    this.addRoomForm.reset({ type: Visibility.PRIVATE });
   }
 
   hasPrivateRoom(user2: string) {
@@ -301,7 +303,7 @@ export class ChatlistSidenav implements OnInit, OnDestroy {
   }
 
   isRestrictedAccess(room: { visibility: string, members: string[] }) {
-    return (room.visibility === 'password' && !this.isUserMember(room)) || (room.visibility === 'public' && !this.isUserMember(room));
+    return (room.visibility === 'password' && !this.isUserMember(room)) || (room.visibility === Visibility.PUBLIC && !this.isUserMember(room));
   }
 
   async openPrivateChat(user2: string) {

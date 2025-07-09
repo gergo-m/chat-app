@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { UserProfile } from '../../shared/model/user';
 
 @Component({
   selector: 'app-update-chatroom-dialog',
@@ -29,7 +30,7 @@ import { MatSelectModule } from '@angular/material/select';
 export class UpdateChatroomDialog {
   updateRoomForm: FormGroup;
   dialogRef = inject(MatDialogRef<UpdateChatroomDialog>);
-  data = inject(MAT_DIALOG_DATA) as { users: any[], currentUserId: string, currentName: string, currentParticipants: string[] };
+  data = inject(MAT_DIALOG_DATA) as { users: UserProfile[], currentUserId: string, currentName: string, currentParticipants: string[] };
 
   constructor() {
     this.updateRoomForm = new FormGroup({

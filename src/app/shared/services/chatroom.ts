@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { collection, collectionData, deleteDoc, doc, docData, Firestore, getDoc, query, setDoc, updateDoc, where } from '@angular/fire/firestore';
 import { combineLatest, map, Observable } from 'rxjs';
 import { Room } from '../model/chatroom';
-import { Collection } from '../util/constant';
+import { Collection, Visibility } from '../util/constant';
 import { Auth } from '@angular/fire/auth';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class ChatroomService {
   private firestore = inject(Firestore);
   auth = inject(Auth);
 
-  async createChatroom(name: string, type: 'group' | 'private', visibility: 'public' | 'private' | 'password', password: string, members: string[]) {
+  async createChatroom(name: string, type: 'group' | 'private', visibility: Visibility, password: string, members: string[]) {
     const chatroomRef = doc(collection(this.firestore, Collection.CHATROOMS));
     console.log(visibility, password);
     await setDoc(chatroomRef, {
@@ -51,7 +51,8 @@ export class ChatroomService {
     await deleteDoc(doc(this.firestore, `chatrooms/${roomId}`));
   }
 
-  getParticipantNames(userIds: string[]): Observable<string[]> {
+  getParticipantNames(userIds: string[] | undefined): Observable<string[]> {
+    if (!userIds) return new Observable<string[]>();
     const userObservables = userIds.map(uid =>
       docData(doc(this.firestore, Collection.USERS, uid))
     );

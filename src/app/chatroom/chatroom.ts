@@ -1,5 +1,5 @@
-import { AfterViewChecked, Component, ElementRef, inject, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
-import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
+import { AfterViewChecked, Component, ElementRef, inject, Input, OnChanges, OnDestroy, ViewChild } from '@angular/core';
+import { combineLatest, map, Observable, of, Subscription, switchMap } from 'rxjs';
 import { Message } from '../shared/model/message';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from '../shared/services/message';
@@ -43,7 +43,7 @@ interface MessageWithPrevSender extends MessageWithSender {
   templateUrl: './chatroom.html',
   styleUrl: './chatroom.scss'
 })
-export class Chatroom implements OnInit, OnChanges, AfterViewChecked {
+export class Chatroom implements OnDestroy, OnChanges, AfterViewChecked {
   route = inject(ActivatedRoute);
   firestore = inject(Firestore);
   auth = inject(Auth);
@@ -61,7 +61,7 @@ export class Chatroom implements OnInit, OnChanges, AfterViewChecked {
   userCollection = collection(this.firestore, Collection.USERS);
   users$: Observable<UserProfile[]>;
   usersArray: UserProfile[] = [];
-
+  usersArraySub: Subscription;
   messagesWithSenders$!: Observable<MessageWithPrevSender[]>;
 
   sendForm = new FormGroup({
@@ -72,12 +72,13 @@ export class Chatroom implements OnInit, OnChanges, AfterViewChecked {
 
   constructor() {
     this.users$ = collectionData(this.userCollection, { idField: 'id' }) as Observable<UserProfile[]>;
-  }
-  
-  ngOnInit() {
-    this.users$.pipe().subscribe(users => {
+    this.usersArraySub = this.users$.pipe().subscribe(users => {
         this.usersArray = users;
     });
+  }
+  
+  ngOnDestroy() {
+    this.usersArraySub.unsubscribe();
   }
 
   ngOnChanges() {
@@ -158,7 +159,7 @@ export class Chatroom implements OnInit, OnChanges, AfterViewChecked {
     if (room.type === 'group') return room.name;
     if (!this.auth.currentUser) return '';
     const otherUid = room.members.find((uid: string) => uid !== this.auth.currentUser?.uid);
-    const otherUser = this.usersArray.find((u: any) => u.id === otherUid);
+    const otherUser = this.usersArray.find((u: UserProfile) => u.id === otherUid);
     return otherUser?.name;
   }
 

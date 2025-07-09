@@ -1,19 +1,25 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { Auth, user } from '@angular/fire/auth';
 import { getDatabase, onDisconnect, onValue, ref, set } from '@angular/fire/database';
+import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PresenceService {
+export class PresenceService implements OnDestroy {
   auth = inject(Auth);
+  userSub: Subscription;
 
   constructor() {
-    user(this.auth).subscribe(currentUser => {
+    this.userSub = user(this.auth).subscribe(currentUser => {
       if (currentUser) {
         this.setPresence(currentUser.uid);
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.userSub.unsubscribe();
   }
 
   setPresence(uid: string) {
